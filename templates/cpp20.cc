@@ -31,7 +31,7 @@ inline void cp_main() {
 // standard libraries
 #if __has_include(<bits/stdc++.h>)
 #  include <bits/stdc++.h>
-#else
+#else // <bits/stdc++.h>
 // C++17 (clang)
 #  include <cassert>
 #  include <cfenv>
@@ -64,7 +64,7 @@ inline void cp_main() {
 #  include <random>
 #  include <ctgmath>
 #  include <fstream>
-#endif
+#endif // <bits/stdc++.h>
 
 // boost libraries
 #if __has_include(<boost/multiprecision/cpp_int.hpp>)
@@ -106,6 +106,14 @@ concept IsEachable = requires (T a) {
 #endif // C++20
 
 /// utils
+
+template <typename T>
+constexpr T inf() {
+  if (std::numeric_limits<T>::has_infinity) {
+    return std::numeric_limits<T>::infinity();
+  }
+  return std::numeric_limits<T>::max() / 2;
+}
 
 template <typename T>
 constexpr int sin90(T theta90) {
@@ -265,32 +273,44 @@ int main() {
 using i32 = int;
 using i64 = long long int;
 using i128 = __int128;
+using f32 = float;
+using f64 = double;
+using f128 = long double;
 using str = std::string;
 template <typename T> using vec = std::vector<T>;
 template <typename T> using deq = std::deque<T>;
 template <typename T> using list = std::list<T>;
+template <typename T, typename Compare = std::less<T>> using p_que =
+  std::priority_queue<T, std::vector<T>, Compare>;
+template <typename Key, typename Compare = std::less<Key>> using mset =
+  std::multiset<Key, Compare>;
+template <typename Key, typename T, typename Compare = std::less<Key>> using mmap =
+  std::multimap<Key, T, Compare>;
 template <typename Key> using u_set = std::unordered_set<Key>;
 template <typename Key> using u_mset = std::unordered_multiset<Key>;
-template <typename Key> using mset = std::multiset<Key>;
 template <typename Key, typename T> using u_map = std::unordered_map<Key, T>;
 template <typename Key, typename T> using u_mmap = std::unordered_multimap<Key, T>;
-template <typename Key, typename T> using mmap = std::multimap<Key, T>;
 template <size_t N> using bset = std::bitset<N>;
-#if __cplusplus >= 202002L
+#if __has_include(<ranges>)
 using v_iota = std::views::iota;
-#endif // C++20
+#endif // <ranges>
 #ifdef INCLUDED_CPP_INT
 using bigint = boost::multiprecision::cpp_int;
 #endif // INCLUDED_CPP_INT
 
 using namespace std;
-#if __cplusplus >= 202002L
+#if __has_include(<ranges>)
 using rng = std::ranges;
-using viw = std::views;
-#endif // C++20
+using viw = std::ranges::views;
+#endif // <ranges>
 #ifdef INCLUDED_ACL
 using namespace atcoder;
 #endif // INCLUDED_ACL
+
+constexpr auto infi = inf<int>();
+constexpr auto infl = inf<long long int>();
+constexpr auto infd = inf<double>();
+constexpr auto infld = inf<long double>();
 
 // functions
 #define p1 first
