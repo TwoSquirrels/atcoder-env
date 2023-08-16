@@ -311,6 +311,7 @@ constexpr auto infd = inf<double>();
 constexpr auto infld = inf<long double>();
 
 // functions
+#define tostr to_string
 #define dist distance
 #define min_e min_element
 #define max_e max_element
