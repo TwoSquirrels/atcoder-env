@@ -8,7 +8,7 @@
 
 //using mint=modint998244353;
 
-inline void cp_main() {
+inline std::string cp_main() {
   
 }
 
@@ -238,7 +238,7 @@ struct Scanner {
 
 #if !defined(__INCLUDE_LEVEL__) || __INCLUDE_LEVEL__ <= 1
 
-inline void cp_main();
+ inline std::string cp_main();
 
 int main() {
   using namespace std;
@@ -252,7 +252,8 @@ int main() {
     ios_base::sync_with_stdio(false);
     cout << fixed << setprecision(8);
     // run!!!
-    cp_main();
+    const auto result = cp_main();
+    if (!result.empty()) cout << result;
 #  ifdef DEBUG
     cout << endl;
   } catch (exception e) {
@@ -291,18 +292,15 @@ template <typename Key> using u_mset = std::unordered_multiset<Key>;
 template <typename Key, typename T> using u_map = std::unordered_map<Key, T>;
 template <typename Key, typename T> using u_mmap = std::unordered_multimap<Key, T>;
 template <size_t N> using bset = std::bitset<N>;
-#if __has_include(<ranges>)
-using v_iota = std::views::iota;
-#endif // <ranges>
 #ifdef INCLUDED_CPP_INT
 using bigint = boost::multiprecision::cpp_int;
 #endif // INCLUDED_CPP_INT
 
 using namespace std;
-#if __has_include(<ranges>)
-using rng = std::ranges;
-using viw = std::ranges::views;
-#endif // <ranges>
+#if __cplusplus >= 202002L && __has_include(<ranges>)
+namespace rng = std::ranges;
+namespace viw = std::ranges::views;
+#endif // C++20 && <ranges>
 #ifdef INCLUDED_ACL
 using namespace atcoder;
 #endif // INCLUDED_ACL
@@ -313,12 +311,15 @@ constexpr auto infd = inf<double>();
 constexpr auto infld = inf<long double>();
 
 // functions
-#define p1 first
-#define p2 second
 #define dist distance
 #define min_e min_element
 #define max_e max_element
+#define iota_v iota_view
+#define p1 first
+#define p2 second
 #define has contains
+#define bgn begin
+#define rbgn rbegin
 #define eb emplace_back
 #define ef emplace_front
 #define pb pop_back
