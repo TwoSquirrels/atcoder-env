@@ -2,6 +2,8 @@
 // (c) 2023 TwoSquirrels
 // my AtCoder environment: https://github.com/TwoSquirrels/atcoder-env
 
+//#define DEBUG
+
 #ifndef INCLUDED_MAIN
 #  define INCLUDED_MAIN
 #  include __FILE__
@@ -211,8 +213,33 @@ bool is_prime(T n) {
   return true;
 }
 
+// TODO: divisor enumeration, prime factorization
+
+template <typename T>
+T fact(int n) {
+  assert(n >= 0);
+  static std::vector<T> factorials = { 1 };
+  for (int i = factorials.size(); i <= n; i++) {
+    factorials.emplace_back(i * factorials[i - 1]);
+  }
+  return factorials[n];
+}
+template <typename T>
+T perm(int n, int k) {
+  return fact<T>(n) / fact<T>(n - k);
+}
+template <typename T>
+T comb(int n, int k) {
+  return perm<T>(n, k) / fact<T>(k);
+}
+
 inline std::string yn(bool yes) {
   return yes ? "Yes" : "No";
+}
+
+template <typename T>
+std::string to_pretty_str(T target) {
+  return "<TODO>";
 }
 
 // input
@@ -311,7 +338,40 @@ inline void outputln(T target, Sep separator = ' ', bool flush = false) {
   write_stdout('\n', flush);
 }
 
-// TODO: dump for debug
+// dump
+template <typename... Types>
+void dump_stderr(std::string labels,
+                 std::tuple<Types...> targets_tupl,
+                 int line = -1, std::string file = (__FILE__)) {
+  std::cerr << "[DEBUG] ";
+  if (line >= 0) {
+    std::cerr << "(";
+    if (file != (__FILE__)) std::cerr << file << ":";
+    std::cerr << "L" << line << ") ";
+  }
+  std::apply([labels](auto... targets) {
+    int i = 0, label_left = 0;
+    (([&](auto target) {
+      const auto label_len = labels.find(',', label_left) - label_left;
+      const auto label =
+        std::regex_replace(labels.substr(label_left, label_len),
+                           std::regex("^\\s+|\\s+$"), "");
+      if (i >= 1) std::cerr << ", ";
+      std::cerr << label << ": ";
+      std::cerr << /*to_pretty_str*/(target);
+      label_left += label_len + 1;
+      i++;
+    })(targets), ...);
+    std::cerr << ";" << std::endl;
+  }, targets_tupl);
+}
+#ifdef DEBUG
+#  define dump(...) (dump_stderr((#__VA_ARGS__),                \
+                                 std::make_tuple(__VA_ARGS__),  \
+                                 (__LINE__), (__FILE__)), true)
+#else // DEBUG
+#  define dump(...) (false)
+#endif // DEBUG
 
 /// main
 
