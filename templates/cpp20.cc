@@ -10,6 +10,7 @@
 
 inline std::string cp_main() {
   
+  return "";
 }
 
 #else // INCLUDED_MAIN
@@ -92,6 +93,14 @@ inline std::string cp_main() {
 template <typename T>
 concept IsInputable = requires (T a) {
   std::cin >> a;
+};
+template <typename T>
+concept IsOutputable = requires (T a) {
+  std::cout << a;
+};
+template <typename T>
+concept IsMutableNumber = requires (T a) {
+  a = 0LL;
 };
 template <typename T>
 concept IsPair = requires (T a) {
@@ -203,21 +212,39 @@ bool is_prime(T n) {
 }
 
 // input
+#ifdef DEBUG
+std::chrono::milliseconds input_total_ms{0};
+#endif // DEBUG
 template <typename T>
-inline auto input(T &&target) -> T {
+inline void read_stdin(T &&target) {
+#ifdef DEBUG
+  using namespace std::chrono;
+  const auto start = system_clock::now();
+  std::cin >> target;
+  const auto end = system_clock::now();
+  input_total_ms += duration_cast<milliseconds>(end - start);
+#else // DEBUG
+  std::cin >> target;
+#endif // DEBUG
+}
+template <typename T>
+inline T input(T &&target) {
 #if __cplusplus >= 202002L
   if constexpr (IsInputable<T>) {
-    std::cin >> target;
+    read_stdin(target);
   } else if constexpr (IsEachable<T>) {
     for (auto &&target_i : target) input(target_i);
   } else if constexpr (IsPair<T>) {
     input(target.first);
     input(target.second);
+  } else if constexpr (IsMutableNumber<T>) {
+    long long int n;
+    target = input(n);
   } else {
     // skip
   }
 #else // C++20
-  std::cin >> target;
+  read_stdin(target);
 #endif // C++20
   return target;
 }
@@ -230,7 +257,55 @@ struct Scanner {
   }
 } scan;
 
-// TODO: output
+// output
+template <typename T>
+inline void write_stdout(T target, bool flush = false) {
+  std::cout << target;
+  if (flush) std::cout << std::flush;
+}
+template <typename T, typename Sep = char>
+inline void output(T target, Sep separator = ' ', bool flush = false) {
+#if __cplusplus >= 202002L
+  if constexpr (IsOutputable<T>) {
+    write_stdout(target, flush);
+  } else if constexpr (std::is_convertible<T, __int128_t>::value) {
+    std::string target_str = "";
+    __uint128_t target_tmp = target < 0 ? -target : target;
+    do {
+      target_str += '0' + target_tmp % 10;
+      target_tmp /= 10;
+    } while (target_tmp != 0);
+    if (target < 0) target_str += '-';
+    std::reverse(target_str.begin(), target_str.end());
+    write_stdout(target_str, flush);
+#ifdef INCLUDED_ACL
+  } else if constexpr (atcoder::internal::is_modint<T>::value) {
+    output(target.val(), separator, flush);
+#endif // INCLUDED_ACL
+  } else if constexpr (IsEachable<T>) {
+    bool separate = false;
+    for (const auto target_i : target) {
+      if (separate) write_stdout(separator);
+      output(target_i, separator);
+      separate = true;
+    }
+    if (flush) write_stdout("", flush);
+  } else if constexpr (IsPair<T>) {
+    output(target.first, separator);
+    write_stdout(separator);
+    output(target.second, separator, flush);
+  } else {
+    write_stdout("<unknown>", flush);
+  }
+#else // C++20
+  write_stdout(target, flush);
+#endif // C++20
+}
+template <typename T, typename Sep = char>
+inline void outputln(T target, Sep separator = ' ', bool flush = false) {
+  output(target, separator);
+  write_stdout('\n', flush);
+}
 
 // TODO: dump for debug
 
@@ -253,16 +328,17 @@ int main() {
     cout << fixed << setprecision(8);
     // run!!!
     const auto result = cp_main();
-    if (!result.empty()) cout << result;
+    if (!result.empty()) write_stdout(result);
 #  ifdef DEBUG
-    cout << endl;
+    write_stdout('\n', true);
   } catch (exception e) {
-    cout << endl;
+    write_stdout('\n', true);
     cerr << "[ERROR] " << e.what() << endl;
   }
   const auto end = system_clock::now();
-  const auto time_ms = duration_cast<milliseconds>(end - start).count();
-  cerr << "[INFO] finished in " << time_ms << " ms!" << endl;
+  const auto time_ms =
+    duration_cast<milliseconds>(end - start) - input_total_ms;
+  cerr << "[INFO] finished in " << time_ms.count() << " ms!" << endl;
 #  endif // DEBUG
   return 0;
 }
