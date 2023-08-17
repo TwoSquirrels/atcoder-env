@@ -10,7 +10,7 @@
 
 inline std::string cp_main() {
   
-  return "";
+  return"";
 }
 
 #else // INCLUDED_MAIN
@@ -211,6 +211,10 @@ bool is_prime(T n) {
   return true;
 }
 
+inline std::string yn(bool yes) {
+  return yes ? "Yes" : "No";
+}
+
 // input
 #ifdef DEBUG
 std::chrono::milliseconds input_total_ms{0};
@@ -313,7 +317,7 @@ inline void outputln(T target, Sep separator = ' ', bool flush = false) {
 
 #if !defined(__INCLUDE_LEVEL__) || __INCLUDE_LEVEL__ <= 1
 
- inline std::string cp_main();
+inline std::string cp_main();
 
 int main() {
   using namespace std;
