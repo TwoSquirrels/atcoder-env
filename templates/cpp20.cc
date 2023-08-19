@@ -69,6 +69,12 @@ inline std::string cp_main() {
 #  include <fstream>
 #endif // <bits/stdc++.h>
 
+/// abi
+#if __has_include(<cxxabi.h>)
+#  define INCLUDED_CXXABI
+#  include <cxxabi.h>
+#endif // <cxxabi.h>
+
 // boost libraries
 #if __has_include(<boost/multiprecision/cpp_int.hpp>)
 #  define INCLUDED_BOOST_CPP_INT
@@ -90,6 +96,22 @@ inline std::string cp_main() {
 #endif
 
 /// sfinae
+
+// is_pair
+template <typename T>
+struct is_pair: std::false_type {};
+template <typename T, typename U>
+struct is_pair<std::pair<T, U>>: std::true_type {};
+template <typename T>
+inline constexpr bool is_pair_v = is_pair<T>::value;
+
+// is_tuple
+template <typename T>
+struct is_tuple: std::false_type {};
+template <typename ...Types>
+struct is_tuple<std::tuple<Types...>>: std::true_type {};
+template <typename T>
+inline constexpr bool is_tuple_v = is_tuple<T>::value;
 
 #if __cplusplus >= 202002L
 template <typename T>
@@ -117,6 +139,23 @@ concept IsEachable = requires (T a) {
 #endif // C++20
 
 /// utils
+
+template <typename T>
+inline std::string get_typename(int length_limit = -1) {
+  std::string name;
+#ifdef INCLUDED_CXXABI
+  name = abi::__cxa_demangle(typeid(T).name(), nullptr, nullptr, nullptr);
+#else // INCLUDED_CXXABI
+  name = typeid(T).name();
+#endif // INCLUDED_CXXABI
+#ifdef __ANDROID__
+  name = std::regex_replace(name, std::regex("::__ndk1::"), "::");
+#endif // __ANDROID__
+  if (name.length() > length_limit) {
+    name = name.substr(0, length_limit - 3) + "...";
+  }
+  return name;
+}
 
 template <typename T>
 constexpr T inf() {
@@ -237,9 +276,73 @@ inline std::string yn(bool yes) {
   return yes ? "Yes" : "No";
 }
 
+std::string int128_to_str(__int128_t target) {
+  std::string target_str = "";
+  __uint128_t target_tmp = target < 0 ? -target : target;
+  do {
+    target_str += '0' + target_tmp % 10;
+    target_tmp /= 10;
+  } while (target_tmp != 0);
+  if (target < 0) target_str += '-';
+  std::reverse(target_str.begin(), target_str.end());
+  return target_str;
+}
+
 template <typename T>
 std::string to_pretty_str(T target) {
-  return "<TODO>";
+  using namespace std;
+  string str = "";
+  if constexpr (is_void_v<T>) {
+    str += "void"s;
+  } else if constexpr (is_null_pointer_v<T>) {
+    str += "null"s;
+  } else if constexpr (is_same_v<T, bool>) {
+    str += target ? "true"s : "false"s;
+  } else if constexpr (is_same_v<T, char> || is_same_v<T, char16_t> ||
+                       is_same_v<T, char32_t> || is_same_v<T, wchar_t>) {
+    str += "'"s + target + "'"s;
+#ifdef INCLUDED_ACL
+  } else if constexpr (atcoder::internal::is_modint<T>::value) {
+    str += to_string(target.val()) + "(mod)"s;
+#endif // INCLUDED_ACL
+  } else if constexpr (is_arithmetic_v<T>) {
+    if constexpr (is_same_v<T, __int128_t>) str += int128_to_str(target);
+    else str += to_string(target);
+    if constexpr (is_unsigned_v<T>) str += "u"s;
+    if constexpr (is_same_v<remove_cv_t<T>, long>) str += "L"s;
+    else if constexpr (is_same_v<remove_cv_t<T>, long long>) str += "LL"s;
+    else if constexpr (is_same_v<T, __int128_t>) str += "LLL"s;
+  } else if constexpr (is_pair_v<T>) {
+    str += "("s + to_pretty_str(target.first);
+    str += ", "s + to_pretty_str(target.second) + ")"s;
+  } else if constexpr (is_convertible_v<T, string>) {
+    str += "\""s + target + "\""s;
+  } else if constexpr (is_array_v<T>) {
+    str += "["s;
+    bool separate = false;
+    for (const auto &target_i : target) {
+      if (separate) str += ", "s;
+      str += to_pretty_str(target_i);
+      separate = true;
+    }
+    str += "]"s;
+#if __cplusplus >= 202002L
+  } else if constexpr (IsEachable<T>) {
+    str += get_typename<T>(20) + "{"s;
+    bool separate = false;
+    for (const auto &target_i : target) {
+      if (separate) str += ","s;
+      str += " "s + to_pretty_str(target_i);
+      separate = true;
+    }
+    if (separate) str += " "s;
+    str += "}"s;
+#endif // C++20
+  } else {
+    str += "<"s + get_typename<T>(20);
+    str += " ("s + to_string(sizeof(target)) + " byte)>"s;
+  }
+  return str;
 }
 
 // input
@@ -300,19 +403,11 @@ inline void output(T target, Sep separator = ' ', bool flush = false) {
   if constexpr (IsOutputable<T>) {
     write_stdout(target, flush);
   } else if constexpr (std::is_convertible<T, __int128_t>::value) {
-    std::string target_str = "";
-    __uint128_t target_tmp = target < 0 ? -target : target;
-    do {
-      target_str += '0' + target_tmp % 10;
-      target_tmp /= 10;
-    } while (target_tmp != 0);
-    if (target < 0) target_str += '-';
-    std::reverse(target_str.begin(), target_str.end());
-    write_stdout(target_str, flush);
-#ifdef INCLUDED_ACL
+    write_stdout(int128_to_str(target), flush);
+#  ifdef INCLUDED_ACL
   } else if constexpr (atcoder::internal::is_modint<T>::value) {
     output(target.val(), separator, flush);
-#endif // INCLUDED_ACL
+#  endif // INCLUDED_ACL
   } else if constexpr (IsEachable<T>) {
     bool separate = false;
     for (const auto target_i : target) {
@@ -358,7 +453,7 @@ void dump_stderr(std::string labels,
                            std::regex("^\\s+|\\s+$"), "");
       if (i >= 1) std::cerr << ", ";
       std::cerr << label << ": ";
-      std::cerr << /*to_pretty_str*/(target);
+      std::cerr << to_pretty_str(target);
       label_left += label_len + 1;
       i++;
     })(targets), ...);
