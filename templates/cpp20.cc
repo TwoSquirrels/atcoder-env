@@ -12,7 +12,7 @@
 
 inline std::string cp_main() {
   
-  return"";
+  return "";
 }
 
 #else // INCLUDED_MAIN
@@ -141,7 +141,7 @@ concept IsEachable = requires (T a) {
 /// utils
 
 template <typename T>
-inline std::string get_typename(int length_limit = -1) {
+inline std::string get_typename(std::size_t length_limit = std::string::npos) {
   std::string name;
 #ifdef INCLUDED_CXXABI
   name = abi::__cxa_demangle(typeid(T).name(), nullptr, nullptr, nullptr);
