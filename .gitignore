@@ -1,2 +1,4 @@
 main.cc
 a.out
+.idea/
+cmake-build-debug/
