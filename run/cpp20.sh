@@ -1,5 +1,8 @@
 #!/bin/bash
 
-g++ -std=gnu++20 -Wall -Wextra \
-    -g -fsanitize=address \
-    -DDEBUG "$1" && ./a.out
+cd "$(dirname "$0")/../"
+
+mkdir ./cmake-build-debug
+cd ./cmake-build-debug/
+
+cmake .. && make && ./atcoder_env
