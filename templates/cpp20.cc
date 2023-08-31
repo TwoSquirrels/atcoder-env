@@ -149,7 +149,7 @@ constexpr T inf() {
   if (std::numeric_limits<T>::has_infinity) {
     return std::numeric_limits<T>::infinity();
   }
-  return std::numeric_limits<T>::max() / 2;
+  return std::numeric_limits<T>::max() / 2.125;
 }
 
 template <typename T>
