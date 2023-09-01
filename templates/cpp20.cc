@@ -85,44 +85,42 @@
 /// sfinae
 
 // is_pair
-template <typename T>
-struct is_pair: std::false_type {};
+template <typename T> inline constexpr bool is_pair_v = false;
 template <typename T, typename U>
-struct is_pair<std::pair<T, U>>: std::true_type {};
-template <typename T>
-inline constexpr bool is_pair_v = is_pair<T>::value;
+inline constexpr bool is_pair_v<std::pair<T, U>> = true;
 
 // is_tuple
-template <typename T>
-struct is_tuple: std::false_type {};
-template <typename ...Types>
-struct is_tuple<std::tuple<Types...>>: std::true_type {};
-template <typename T>
-inline constexpr bool is_tuple_v = is_tuple<T>::value;
+template <typename T> inline constexpr bool is_tuple_v = false;
+template <typename... Types>
+inline constexpr bool is_tuple_v<std::tuple<Types...>> = true;
 
+// istreamable
 #if __cplusplus >= 202002L
+template <typename T> concept istreamable_v = requires (T a) { std::cin >> a; };
+#else // C++20
+template<typename T, typename = void> inline constexpr bool istreamable_v = false;
+template<typename T> inline constexpr bool istreamable_v<
+  T, std::void_t<decltype(std::cin >> std::declval<T&>())>> = true;
+#endif // C++20
+
+// ostreamable
+#if __cplusplus >= 202002L
+template <typename T> concept ostreamable_v = requires (T a) { std::cout << a; };
+#else // C++20
+template<typename T, typename = void> inline constexpr bool ostreamable_v = false;
+template<typename T> inline constexpr bool ostreamable_v<
+  T, std::void_t<decltype(std::cout << std::declval<T&>())>> = true;
+#endif // C++20
+
+// iterable
+#if __has_include(<ranges>)
+template <typename T> concept iterable_v = std::ranges::range<T>;
+#elif __cplusplus >= 202002L
 template <typename T>
-concept IsInputable = requires (T a) {
-  std::cin >> a;
-};
-template <typename T>
-concept IsOutputable = requires (T a) {
-  std::cout << a;
-};
-template <typename T>
-concept IsMutableNumber = requires (T a) {
-  a = 0LL;
-};
-template <typename T>
-concept IsPair = requires (T a) {
-  a.first;
-  a.second;
-};
-template <typename T>
-concept IsEachable = requires (T a) {
-  std::begin(a);
-  std::end(a);
-};
+concept iterable_v = requires (T a) { std::begin(a); std::end(a); };
+#else // C++20
+template <typename T> inline constexpr bool iterable_v = std::is_same_v<
+  decltype(std::begin(std::declval<T>())), decltype(std::end(std::declval<T>()))>;
 #endif // C++20
 
 /// utils
@@ -144,48 +142,41 @@ inline std::string get_typename(std::size_t length_limit = std::string::npos) {
   return name;
 }
 
-template <typename T>
-constexpr T inf() {
-  if (std::numeric_limits<T>::has_infinity) {
+template <typename T> constexpr T inf() {
+  if constexpr (std::numeric_limits<T>::has_infinity) {
     return std::numeric_limits<T>::infinity();
   }
-  return std::numeric_limits<T>::max() / 2.125;
+  return std::numeric_limits<T>::max() / 2.125L;
 }
 
-template <typename T>
-constexpr int sin90(T theta90) {
+template <typename T> constexpr int sin90(T theta90) {
   if (theta90 % 2 == 0) return 0;
   return theta90 % 4 < 2 ? 1 : -1;
 }
-template <typename T>
-constexpr int cos90(T theta90) {
+template <typename T> constexpr int cos90(T theta90) {
   return sin90(theta90 + 1);
 }
-template <typename T>
-constexpr int sin45(T theta45) {
+template <typename T> constexpr int sin45(T theta45) {
   if (theta45 % 4 == 0) return 0;
   return theta45 % 8 < 4 ? 1 : -1;
 }
-template <typename T>
-constexpr int cos45(T theta45) {
+template <typename T> constexpr int cos45(T theta45) {
   return sin90(theta45 + 2);
 }
 
-template <typename T, typename U>
-inline bool chmin(T &&a, const U b) {
+template <typename T, typename U> inline bool chmin(T &&a, const U b) {
   const bool compare = a > b;
   if (compare) a = b;
   return compare;
 }
-template <typename T, typename U>
-inline bool chmax(T &&a, const U b) {
+template <typename T, typename U> inline bool chmax(T &&a, const U b) {
   const bool compare = a < b;
   if (compare) a = b;
   return compare;
 }
 
-long long int powi(int base, int exponent = 2) {
-  long long int ans = 1;
+long long powi(int base, int exponent = 2) {
+  long long ans = 1;
   for (int i = exponent; i != 0; i += (i >= 0 ? -1 : 1)) {
     if (i >= 0) ans *= base;
     else ans /= base;
@@ -194,8 +185,7 @@ long long int powi(int base, int exponent = 2) {
   return ans;
 }
 
-template <typename T>
-bool is_prime(T n) {
+template <typename T> bool is_prime(T n) {
   if (n <= 1) return false;
   if (n == 2 || n == 3) return true;
   if (n % 2 == 0 || n % 3 == 0) return false;
@@ -225,24 +215,19 @@ bool is_prime(T n) {
   for (int i = 2; i <= boost::math::max_prime; i++) {
     const auto prime_i = boost::math::prime(i);
     if (prime_i > n / prime_i) return true;
-    if (n % prime_i == 0) {
-      return false;
-    }
+    if (n % prime_i == 0) return false;
     tried = prime_i;
   }
 #endif // INCLUDED_BOOST_PRIM
   for (T i = (tried + 5) / 6 * 6; i * i <= n; i += 6) {
-    if (n % (i - 1) == 0 || n % (i + 1) == 0) {
-      return false;
-    }
+    if (n % (i - 1) == 0 || n % (i + 1) == 0) return false;
   }
   return true;
 }
 
 // TODO: divisor enumeration, prime factorization
 
-template <typename T>
-T fact(int n) {
+template <typename T> T fact(int n) {
   assert(n >= 0);
   static std::vector<T> factorials = { 1 };
   for (int i = factorials.size(); i <= n; i++) {
@@ -250,17 +235,11 @@ T fact(int n) {
   }
   return factorials[n];
 }
-template <typename T>
-T perm(int n, int k) {
+template <typename T> T perm(int n, int k) {
   return fact<T>(n) / fact<T>(n - k);
 }
-template <typename T>
-T comb(int n, int k) {
+template <typename T> T comb(int n, int k) {
   return perm<T>(n, k) / fact<T>(k);
-}
-
-inline std::string yn(bool yes) {
-  return yes ? "Yes" : "No";
 }
 
 std::string int128_to_str(__int128_t target) {
@@ -275,8 +254,7 @@ std::string int128_to_str(__int128_t target) {
   return target_str;
 }
 
-template <typename T>
-std::string to_pretty_str(T target) {
+template <typename T> std::string to_pretty_str(T target) {
   using namespace std;
   string str = "";
   if constexpr (is_void_v<T>) {
@@ -313,8 +291,7 @@ std::string to_pretty_str(T target) {
       separate = true;
     }
     str += "]"s;
-#if __cplusplus >= 202002L
-  } else if constexpr (IsEachable<T>) {
+  } else if constexpr (iterable_v<T>) {
     str += get_typename<T>(20) + "{"s;
     bool separate = false;
     for (const auto &target_i : target) {
@@ -324,7 +301,6 @@ std::string to_pretty_str(T target) {
     }
     if (separate) str += " "s;
     str += "}"s;
-#endif // C++20
   } else {
     str += "<"s + get_typename<T>(20);
     str += " ("s + to_string(sizeof(target)) + " byte)>"s;
@@ -336,8 +312,7 @@ std::string to_pretty_str(T target) {
 #ifdef DEBUG
 std::chrono::milliseconds input_total_ms{0};
 #endif // DEBUG
-template <typename T>
-inline void read_stdin(T &&target) {
+template <typename T> inline void read_stdin(T &&target) {
 #ifdef DEBUG
   using namespace std::chrono;
   const auto start = system_clock::now();
@@ -350,44 +325,36 @@ inline void read_stdin(T &&target) {
 }
 template <typename T>
 inline T input(T &&target) {
-#if __cplusplus >= 202002L
-  if constexpr (IsInputable<T>) {
+  if constexpr (istreamable_v<T>) {
     read_stdin(target);
-  } else if constexpr (IsEachable<T>) {
+  } else if constexpr (iterable_v<T>) {
     for (auto &&target_i : target) input(target_i);
-  } else if constexpr (IsPair<T>) {
+  } else if constexpr (is_pair_v<T>) {
     input(target.first);
     input(target.second);
-  } else if constexpr (IsMutableNumber<T>) {
-    long long int n;
+  } else if constexpr (std::is_convertible_v<long long, T>) {
+    long long n;
     target = input(n);
   } else {
     // skip
   }
-#else // C++20
-  read_stdin(target);
-#endif // C++20
   return target;
 }
 // input and initialize
 struct Scanner {
-  template <typename T>
-  inline operator T() const {
-    T target;
-    return input(target);
+  template <typename T> inline operator T() const {
+    T target; return input(target);
   }
 } scan;
 
 // output
-template <typename T>
-inline void write_stdout(T target, bool flush = false) {
+template <typename T> inline void write_stdout(T target, bool flush = false) {
   std::cout << target;
   if (flush) std::cout << std::flush;
 }
 template <typename T, typename Sep = char>
 inline void output(T target, Sep separator = ' ', bool flush = false) {
-#if __cplusplus >= 202002L
-  if constexpr (IsOutputable<T>) {
+  if constexpr (ostreamable_v<T>) {
     write_stdout(target, flush);
   } else if constexpr (std::is_convertible<T, __int128_t>::value) {
     write_stdout(int128_to_str(target), flush);
@@ -395,7 +362,7 @@ inline void output(T target, Sep separator = ' ', bool flush = false) {
     } else if constexpr (atcoder::internal::is_modint<T>::value) {
     output(target.val(), separator, flush);
 #  endif // INCLUDED_ACL
-  } else if constexpr (IsEachable<T>) {
+  } else if constexpr (iterable_v<T>) {
     bool separate = false;
     for (const auto target_i : target) {
       if (separate) write_stdout(separator);
@@ -403,16 +370,13 @@ inline void output(T target, Sep separator = ' ', bool flush = false) {
       separate = true;
     }
     if (flush) write_stdout("", flush);
-  } else if constexpr (IsPair<T>) {
+  } else if constexpr (is_pair_v<T>) {
     output(target.first, separator);
     write_stdout(separator);
     output(target.second, separator, flush);
   } else {
     write_stdout("<unknown>", flush);
   }
-#else // C++20
-  write_stdout(target, flush);
-#endif // C++20
 }
 template <typename T, typename Sep = char>
 inline void outputln(T target, Sep separator = ' ', bool flush = false) {
@@ -482,8 +446,7 @@ int main() {
     cerr << "[ERROR] " << e.what() << endl;
   }
   const auto end = system_clock::now();
-  const auto time_ms =
-      duration_cast<milliseconds>(end - start) - input_total_ms;
+  const auto time_ms = duration_cast<milliseconds>(end - start) - input_total_ms;
   cerr << "[INFO] finished in " << time_ms.count() << " ms!" << endl;
 #  endif // DEBUG
   return 0;
@@ -493,22 +456,18 @@ int main() {
 
 /// aliases
 
-using i32 = int;
-using i64 = long long int;
-using i128 = __int128;
-using f32 = float;
-using f64 = double;
-using f128 = long double;
+using i32 = int; using i64 = long long; using i128 = __int128;
+using f32 = float; using f64 = double; using f128 = long double;
 using str = std::string;
 template <typename T> using vec = std::vector<T>;
 template <typename T> using deq = std::deque<T>;
 template <typename T> using list = std::list<T>;
-template <typename T, typename Compare = std::less<T>> using p_que =
-    std::priority_queue<T, std::vector<T>, Compare>;
-template <typename Key, typename Compare = std::less<Key>> using mset =
-    std::multiset<Key, Compare>;
-template <typename Key, typename T, typename Compare = std::less<Key>> using mmap =
-    std::multimap<Key, T, Compare>;
+template <typename T, typename Compare = std::less<T>>
+using p_que = std::priority_queue<T, std::vector<T>, Compare>;
+template <typename Key, typename Compare = std::less<Key>>
+using mset = std::multiset<Key, Compare>;
+template <typename Key, typename T, typename Compare = std::less<Key>>
+using mmap = std::multimap<Key, T, Compare>;
 template <typename Key> using u_set = std::unordered_set<Key>;
 template <typename Key> using u_mset = std::unordered_multiset<Key>;
 template <typename Key, typename T> using u_map = std::unordered_map<Key, T>;
@@ -528,9 +487,13 @@ using namespace atcoder;
 #endif // INCLUDED_ACL
 
 constexpr auto infi = inf<int>();
-constexpr auto infl = inf<long long int>();
+constexpr auto infl = inf<long long>();
 constexpr auto infd = inf<double>();
 constexpr auto infld = inf<long double>();
+const std::array YN = { "No", "Yes" };
+const std::array AB = { "Bob", "Alice" };
+const std::array FS = { "Second", "First" };
+const std::array TA = { "Aoki", "Takahashi" };
 
 // functions
 #define tostr to_string
@@ -548,17 +511,17 @@ constexpr auto infld = inf<long double>();
 #define pb pop_back
 #define pf pop_front
 // repeat
-#define rep(i, n) for (decltype(n) i##_len = (n), i = 0; i < i##_len; i++)
-#define reps(i, l, r) for (decltype(r) i##_right = (r), i = (l); i < i##_right; i++)
-#define rrep(i, n) for (decltype(n) i##_len = (n), i = i##_len - 1; i >= 0; i--)
-#define rreps(i, l, r) for (decltype(l) i##_left = (l), i = (r) - 1; i >= i##_left; i--)
+#define reps(i, l, r) for (std::decay_t<decltype(r)> i##_right = (r), i = (l); i < i##_right; i++)
+#define rep(i, n) reps(i, 0, n)
+#define rreps(i, l, r) for (std::decay_t<decltype(l)> i##_left = (l), i = (r) - 1; i >= i##_left; i--)
+#define rrep(i, n) rreps(i, 0, n)
 #define each(for_able) for (auto &&for_able##_i : (for_able))
 // iterate
 #define all(for_able) (std::begin(for_able)), (std::end(for_able))
 #define rev(for_able) (std::rbegin(for_able)), (std::rend(for_able))
 // lambda
-#define pred(x, expression) ([&](auto &&x) -> bool { return (expression); })
-#define comp(x, y, expression) ([&](auto &&x, auto &&y) -> bool { return (expression); })
+#define pred(x, expr) ([&](auto &&x) -> bool { return (expr); })
+#define comp(x, y, expr) ([&](auto &&x, auto &&y) -> bool { return (expr); })
 
 /// answer
 
