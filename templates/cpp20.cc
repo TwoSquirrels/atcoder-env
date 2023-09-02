@@ -113,11 +113,13 @@ template<typename T> inline constexpr bool ostreamable_v<
 #endif // C++20
 
 // iterable
-#if __has_include(<ranges>)
+#if __cplusplus >= 202002L
+#  if __has_include(<ranges>)
 template <typename T> concept iterable_v = std::ranges::range<T>;
-#elif __cplusplus >= 202002L
+#  else // <ranges>
 template <typename T>
 concept iterable_v = requires (T a) { std::begin(a); std::end(a); };
+#  endif // C++20
 #else // C++20
 template <typename T> inline constexpr bool iterable_v = std::is_same_v<
   decltype(std::begin(std::declval<T>())), decltype(std::end(std::declval<T>()))>;
@@ -191,7 +193,7 @@ template <typename T> bool is_prime(T n) {
   if (n % 2 == 0 || n % 3 == 0) return false;
   // miller rabin
 #ifdef INCLUDED_ACL
-  if (n <= 1LL << 32 && n <= std::numeric_limits<int>::max()) {
+  if (n <= std::min(1LL << 32, static_cast<long long>(std::numeric_limits<int>::max()))) {
     return atcoder::internal::is_prime_constexpr(n);
   }
 #endif // INCLUDED_ACL
@@ -218,7 +220,7 @@ template <typename T> bool is_prime(T n) {
     if (n % prime_i == 0) return false;
     tried = prime_i;
   }
-#endif // INCLUDED_BOOST_PRIM
+#endif // INCLUDED_BOOST_PRIME
   for (T i = (tried + 5) / 6 * 6; i * i <= n; i += 6) {
     if (n % (i - 1) == 0 || n % (i + 1) == 0) return false;
   }
@@ -243,7 +245,7 @@ template <typename T> T comb(int n, int k) {
 }
 
 std::string int128_to_str(__int128_t target) {
-  std::string target_str = "";
+  std::string target_str;
   __uint128_t target_tmp = target < 0 ? -target : target;
   do {
     target_str += '0' + target_tmp % 10;
@@ -256,7 +258,7 @@ std::string int128_to_str(__int128_t target) {
 
 template <typename T> std::string to_pretty_str(T target) {
   using namespace std;
-  string str = "";
+  string str;
   if constexpr (is_void_v<T>) {
     str += "void"s;
   } else if constexpr (is_null_pointer_v<T>) {
@@ -400,8 +402,8 @@ void dump_stderr(std::string labels,
     (([&](auto target) {
       const auto label_len = labels.find(',', label_left) - label_left;
       const auto label =
-          std::regex_replace(labels.substr(label_left, label_len),
-                             std::regex("^\\s+|\\s+$"), "");
+        std::regex_replace(labels.substr(label_left, label_len),
+                           std::regex("^\\s+|\\s+$"), "");
       if (i >= 1) std::cerr << ", ";
       std::cerr << label << ": ";
       std::cerr << to_pretty_str(target);
@@ -441,7 +443,7 @@ int main() {
     if (!result.empty()) write_stdout(result);
 #  ifdef DEBUG
     write_stdout('\n', true);
-  } catch (exception e) {
+  } catch (exception &e) {
     write_stdout('\n', true);
     cerr << "[ERROR] " << e.what() << endl;
   }
