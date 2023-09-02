@@ -486,6 +486,8 @@ namespace viw = std::ranges::views;
 using namespace atcoder;
 #endif // INCLUDED_ACL
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
 constexpr auto infi = inf<int>();
 constexpr auto infl = inf<long long>();
 constexpr auto infd = inf<double>();
@@ -494,6 +496,7 @@ const std::array YN = { "No", "Yes" };
 const std::array AB = { "Bob", "Alice" };
 const std::array FS = { "Second", "First" };
 const std::array TA = { "Aoki", "Takahashi" };
+#pragma GCC diagnostic pop
 
 // functions
 #define tostr to_string
