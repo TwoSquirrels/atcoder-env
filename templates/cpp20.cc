@@ -327,18 +327,22 @@ template <typename T> inline void read_stdin(T &&target) {
 }
 template <typename T>
 inline T input(T &&target) {
-  if constexpr (istreamable_v<T>) {
+  using T_V = std::remove_reference_t<T>;
+  if constexpr (istreamable_v<T_V>) {
     read_stdin(target);
-  } else if constexpr (iterable_v<T>) {
+  } else if constexpr (iterable_v<T_V>) {
     for (auto &&target_i : target) input(target_i);
-  } else if constexpr (is_pair_v<T>) {
+  } else if constexpr (is_pair_v<T_V>) {
     input(target.first);
     input(target.second);
-  } else if constexpr (std::is_convertible_v<long long, T>) {
+  } else if constexpr (std::is_convertible_v<long long, T_V>) {
     long long n;
     target = input(n);
   } else {
-    // skip
+#ifdef DEBUG
+    std::cerr << "[WARN] Type " << get_typename<T_V>()
+              << " is invalid, so input is skipped;" << std::endl;
+#endif //DEBUG
   }
   return target;
 }
@@ -533,6 +537,6 @@ const std::array TA = { "Aoki", "Takahashi" };
 //using mint=modint998244353;
 
 inline str cp_main() {
-  
+
   return "";
 }
