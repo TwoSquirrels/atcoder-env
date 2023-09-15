@@ -1,5 +1,15 @@
-main.cc
-a.out
-a.exe
-.idea/
-cmake-build-debug/
+# To use the top directory freely, I ignore everything by default.
+
+*
+
+!.gitignore
+
+!LICENSE
+!README.md
+
+!run/
+!run/*
+!templates/
+!templates/*
+
+!CMakeLists.txt
