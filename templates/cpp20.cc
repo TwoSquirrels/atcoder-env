@@ -391,10 +391,14 @@ inline void outputln(T target, Sep separator = ' ', bool flush = false) {
 }
 
 // dump
+#ifdef DEBUG
+std::chrono::milliseconds dump_total_ms{0};
 template <typename... Types>
 void dump_stderr(std::string labels,
                  std::tuple<Types...> targets_tupl,
                  int line = -1, std::string file = (__FILE__)) {
+  using namespace std::chrono;
+  const auto start = system_clock::now();
   std::cerr << "[DEBUG] ";
   if (line >= 0) {
     std::cerr << "(";
@@ -416,8 +420,9 @@ void dump_stderr(std::string labels,
     })(targets), ...);
     std::cerr << ";" << std::endl;
   }, targets_tupl);
+  const auto end = system_clock::now();
+  dump_total_ms += duration_cast<milliseconds>(end - start);
 }
-#ifdef DEBUG
 #  define dump(...) (dump_stderr((#__VA_ARGS__),                \
                                  std::make_tuple(__VA_ARGS__),  \
                                  (__LINE__), (__FILE__)), true)
@@ -452,7 +457,8 @@ int main() {
     cerr << "[ERROR] " << e.what() << endl;
   }
   const auto end = system_clock::now();
-  const auto time_ms = duration_cast<milliseconds>(end - start) - input_total_ms;
+  const auto time_ms =
+    duration_cast<milliseconds>(end - start) - input_total_ms - dump_total_ms;
   cerr << "[INFO] finished in " << time_ms.count() << " ms!" << endl;
 #  endif // DEBUG
   return 0;
@@ -462,7 +468,9 @@ int main() {
 
 /// aliases
 
-using i32 = int; using i64 = long long; using i128 = __int128;
+using i32 = int; using u32 = unsigned int;
+using i64 = long long; using u64 = unsigned long long;
+using i128 = __int128; using u128 = unsigned __int128;
 using f32 = float; using f64 = double; using f128 = long double;
 using str = std::string;
 template <typename T> using vec = std::vector<T>;
@@ -537,6 +545,6 @@ const std::array TA = { "Aoki", "Takahashi" };
 //using mint=modint998244353;
 
 inline str cp_main() {
-
+  
   return "";
 }
