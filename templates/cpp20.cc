@@ -86,21 +86,19 @@
 
 // is_pair
 template <typename T> inline constexpr bool is_pair_v = false;
-template <typename T, typename U>
-inline constexpr bool is_pair_v<std::pair<T, U>> = true;
+template <typename T, typename U> inline constexpr bool is_pair_v<std::pair<T, U>> = true;
 
 // is_tuple
 template <typename T> inline constexpr bool is_tuple_v = false;
-template <typename... Types>
-inline constexpr bool is_tuple_v<std::tuple<Types...>> = true;
+template <typename... Types> inline constexpr bool is_tuple_v<std::tuple<Types...>> = true;
 
 // istreamable
 #if __cplusplus >= 202002L
 template <typename T> concept istreamable_v = requires (T a) { std::cin >> a; };
 #else // C++20
 template<typename T, typename = void> inline constexpr bool istreamable_v = false;
-template<typename T> inline constexpr bool istreamable_v<
-  T, std::void_t<decltype(std::cin >> std::declval<T&>())>> = true;
+template<typename T>
+inline constexpr bool istreamable_v<T, std::void_t<decltype(std::cin >> std::declval<T&>())>> = true;
 #endif // C++20
 
 // ostreamable
@@ -108,8 +106,8 @@ template<typename T> inline constexpr bool istreamable_v<
 template <typename T> concept ostreamable_v = requires (T a) { std::cout << a; };
 #else // C++20
 template<typename T, typename = void> inline constexpr bool ostreamable_v = false;
-template<typename T> inline constexpr bool ostreamable_v<
-  T, std::void_t<decltype(std::cout << std::declval<T&>())>> = true;
+template<typename T>
+inline constexpr bool ostreamable_v<T, std::void_t<decltype(std::cout << std::declval<T&>())>> = true;
 #endif // C++20
 
 // iterable
@@ -117,18 +115,16 @@ template<typename T> inline constexpr bool ostreamable_v<
 #  if __has_include(<ranges>)
 template <typename T> concept iterable_v = std::ranges::range<T>;
 #  else // <ranges>
-template <typename T>
-concept iterable_v = requires (T a) { std::begin(a); std::end(a); };
+template <typename T> concept iterable_v = requires (T a) { std::begin(a); std::end(a); };
 #  endif // C++20
 #else // C++20
-template <typename T> inline constexpr bool iterable_v = std::is_same_v<
-  decltype(std::begin(std::declval<T>())), decltype(std::end(std::declval<T>()))>;
+template <typename T> inline constexpr bool iterable_v =
+  std::is_same_v<decltype(std::begin(std::declval<T>())), decltype(std::end(std::declval<T>()))>;
 #endif // C++20
 
 /// utils
 
-template <typename T>
-inline std::string get_typename(std::size_t length_limit = std::string::npos) {
+template <typename T> inline std::string get_typename(std::size_t length_limit = std::string::npos) {
   std::string name;
 #ifdef INCLUDED_CXXABI
   name = abi::__cxa_demangle(typeid(T).name(), nullptr, nullptr, nullptr);
@@ -138,16 +134,12 @@ inline std::string get_typename(std::size_t length_limit = std::string::npos) {
 #ifdef __ANDROID__
   name = std::regex_replace(name, std::regex("::__ndk1::"), "::");
 #endif // __ANDROID__
-  if (name.length() > length_limit) {
-    name = name.substr(0, length_limit - 3) + "...";
-  }
+  if (name.length() > length_limit) name = name.substr(0, length_limit - 3) + "...";
   return name;
 }
 
 template <typename T> constexpr T inf() {
-  if constexpr (std::numeric_limits<T>::has_infinity) {
-    return std::numeric_limits<T>::infinity();
-  }
+  if constexpr (std::numeric_limits<T>::has_infinity) return std::numeric_limits<T>::infinity();
   return std::numeric_limits<T>::max() / 2.125L;
 }
 
@@ -232,9 +224,7 @@ template <typename T> bool is_prime(T n) {
 template <typename T> T fact(int n) {
   assert(n >= 0);
   static std::vector<T> factorials = { 1 };
-  for (int i = factorials.size(); i <= n; i++) {
-    factorials.emplace_back(i * factorials[i - 1]);
-  }
+  for (int i = factorials.size(); i <= n; i++) factorials.emplace_back(i * factorials[i - 1]);
   return factorials[n];
 }
 template <typename T> T perm(int n, int k) {
@@ -242,6 +232,15 @@ template <typename T> T perm(int n, int k) {
 }
 template <typename T> T comb(int n, int k) {
   return perm<T>(n, k) / fact<T>(k);
+}
+
+template <typename T> std::vector<std::vector<T>> rotate(std::vector<std::vector<T>> grid, int angle = 1) {
+  angle %= 4;
+  if (angle == 0) return grid;
+  auto h = grid.size(), w = grid[0].size();
+  auto rotated = std::vector(w, std::vector<T>(h));
+  for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) rotated[w - 1 - x][y] = grid[y][x];
+  return rotate(rotated, angle - 1);
 }
 
 std::string int128_to_str(__int128_t target) {
@@ -259,14 +258,10 @@ std::string int128_to_str(__int128_t target) {
 template <typename T> std::string to_pretty_str(T target) {
   using namespace std;
   string str;
-  if constexpr (is_void_v<T>) {
-    str += "void"s;
-  } else if constexpr (is_null_pointer_v<T>) {
-    str += "null"s;
-  } else if constexpr (is_same_v<T, bool>) {
-    str += target ? "true"s : "false"s;
-  } else if constexpr (is_same_v<T, char> || is_same_v<T, char16_t> ||
-                       is_same_v<T, char32_t> || is_same_v<T, wchar_t>) {
+  if constexpr (is_void_v<T>) str += "void"s;
+  else if constexpr (is_null_pointer_v<T>) str += "null"s;
+  else if constexpr (is_same_v<T, bool>) str += target ? "true"s : "false"s;
+  else if constexpr (is_same_v<T, char> || is_same_v<T, char16_t> || is_same_v<T, char32_t> || is_same_v<T, wchar_t>) {
     str += "'"s + target + "'"s;
 #ifdef INCLUDED_ACL
     } else if constexpr (atcoder::internal::is_modint<T>::value) {
@@ -325,14 +320,11 @@ template <typename T> inline void read_stdin(T &&target) {
   std::cin >> target;
 #endif // DEBUG
 }
-template <typename T>
-inline T input(T &&target) {
+template <typename T> inline T input(T &&target) {
   using T_V = std::remove_reference_t<T>;
-  if constexpr (istreamable_v<T_V>) {
-    read_stdin(target);
-  } else if constexpr (iterable_v<T_V>) {
-    for (auto &&target_i : target) input(target_i);
-  } else if constexpr (is_pair_v<T_V>) {
+  if constexpr (istreamable_v<T_V>) read_stdin(target);
+  else if constexpr (iterable_v<T_V>) for (auto &&target_i : target) input(target_i);
+  else if constexpr (is_pair_v<T_V>) {
     input(target.first);
     input(target.second);
   } else if constexpr (std::is_convertible_v<long long, T_V>) {
@@ -347,19 +339,14 @@ inline T input(T &&target) {
   return target;
 }
 // input and initialize
-struct Scanner {
-  template <typename T> inline operator T() const {
-    T target; return input(target);
-  }
-} scan;
+struct Scanner { template <typename T> inline operator T() const { T target; return input(target); } } scan;
 
 // output
 template <typename T> inline void write_stdout(T target, bool flush = false) {
   std::cout << target;
   if (flush) std::cout << std::flush;
 }
-template <typename T, typename Sep = char>
-inline void output(T target, Sep separator = ' ', bool flush = false) {
+template <typename T, typename Sep = char> inline void output(T target, Sep separator = ' ', bool flush = false) {
   if constexpr (ostreamable_v<T>) {
     write_stdout(target, flush);
   } else if constexpr (std::is_convertible<T, __int128_t>::value) {
@@ -384,8 +371,7 @@ inline void output(T target, Sep separator = ' ', bool flush = false) {
     write_stdout("<unknown>", flush);
   }
 }
-template <typename T, typename Sep = char>
-inline void outputln(T target, Sep separator = ' ', bool flush = false) {
+template <typename T, typename Sep = char> inline void outputln(T target, Sep separator = ' ', bool flush = false) {
   output(target, separator);
   write_stdout('\n', flush);
 }
@@ -394,9 +380,7 @@ inline void outputln(T target, Sep separator = ' ', bool flush = false) {
 #ifdef DEBUG
 std::chrono::milliseconds dump_total_ms{0};
 template <typename... Types>
-void dump_stderr(std::string labels,
-                 std::tuple<Types...> targets_tupl,
-                 int line = -1, std::string file = (__FILE__)) {
+void dump_stderr(std::string labels, std::tuple<Types...> targets_tupl, int line = -1, std::string file = (__FILE__)) {
   using namespace std::chrono;
   const auto start = system_clock::now();
   std::cerr << "[DEBUG] ";
@@ -423,9 +407,7 @@ void dump_stderr(std::string labels,
   const auto end = system_clock::now();
   dump_total_ms += duration_cast<milliseconds>(end - start);
 }
-#  define dump(...) (dump_stderr((#__VA_ARGS__),                \
-                                 std::make_tuple(__VA_ARGS__),  \
-                                 (__LINE__), (__FILE__)), true)
+#  define dump(...) (dump_stderr((#__VA_ARGS__), std::make_tuple(__VA_ARGS__), (__LINE__), (__FILE__)), true)
 #else // DEBUG
 #  define dump(...) (false)
 #endif // DEBUG
@@ -457,8 +439,7 @@ int main() {
     cerr << "[ERROR] " << e.what() << endl;
   }
   const auto end = system_clock::now();
-  const auto time_ms =
-    duration_cast<milliseconds>(end - start) - input_total_ms - dump_total_ms;
+  const auto time_ms = duration_cast<milliseconds>(end - start) - input_total_ms - dump_total_ms;
   cerr << "[INFO] finished in " << time_ms.count() << " ms!" << endl;
 #  endif // DEBUG
   return 0;
@@ -476,12 +457,9 @@ using str = std::string;
 template <typename T> using vec = std::vector<T>;
 template <typename T> using deq = std::deque<T>;
 template <typename T> using list = std::list<T>;
-template <typename T, typename Compare = std::less<T>>
-using p_que = std::priority_queue<T, std::vector<T>, Compare>;
-template <typename Key, typename Compare = std::less<Key>>
-using mset = std::multiset<Key, Compare>;
-template <typename Key, typename T, typename Compare = std::less<Key>>
-using mmap = std::multimap<Key, T, Compare>;
+template <typename T, typename Compare = std::less<T>> using p_que = std::priority_queue<T, std::vector<T>, Compare>;
+template <typename Key, typename Compare = std::less<Key>> using mset = std::multiset<Key, Compare>;
+template <typename Key, typename T, typename Compare = std::less<Key>> using mmap = std::multimap<Key, T, Compare>;
 template <typename Key> using u_set = std::unordered_set<Key>;
 template <typename Key> using u_mset = std::unordered_multiset<Key>;
 template <typename Key, typename T> using u_map = std::unordered_map<Key, T>;
