@@ -179,6 +179,17 @@ long long powi(int base, int exponent = 2) {
   return ans;
 }
 
+#ifdef INCLUDED_ACL
+template <typename T = atcoder::modint>
+T mint_inv(T x) {
+  constexpr size_t memo_limit = 1 << 24;
+  static std::array<T, memo_limit> memo;
+  if (x.val() >= memo_limit) return x.inv();
+  if (memo[x.val()] == 0) memo[x.val()] = x.inv();
+  return memo[x.val()];
+}
+#endif // INCLUDED_ACL
+
 template <typename T> bool is_prime(T n) {
   if (n <= 1) return false;
   if (n == 2 || n == 3) return true;
@@ -221,18 +232,15 @@ template <typename T> bool is_prime(T n) {
 
 // TODO: divisor enumeration, prime factorization
 
-template <typename T> T fact(int n) {
+template <typename T> T fact(int n, bool inv = false) {
   assert(n >= 0);
-  static std::vector<T> factorials = { 1 };
-  for (int i = factorials.size(); i <= n; i++) factorials.emplace_back(i * factorials[i - 1]);
-  return factorials[n];
+  static std::vector<std::pair<T, T>> factorials = { { 1, 1 } };
+  for (int i = factorials.size(); i <= n; i++) factorials.emplace_back(i * factorials[i - 1].first, 0);
+  if (inv && factorials[n].second == 0) factorials[n].second = mint_inv(factorials[n].first);
+  return inv ? factorials[n].second : factorials[n].first;
 }
-template <typename T> T perm(int n, int k) {
-  return fact<T>(n) / fact<T>(n - k);
-}
-template <typename T> T comb(int n, int k) {
-  return perm<T>(n, k) / fact<T>(k);
-}
+template <typename T> T perm(int n, int k) { return fact<T>(n) * fact<T>(n - k, true); }
+template <typename T> T comb(int n, int k) { return perm<T>(n, k) * fact<T>(k, true); }
 
 template <typename T> std::vector<std::vector<T>> rotate(std::vector<std::vector<T>> grid, int angle = 1) {
   angle %= 4;
