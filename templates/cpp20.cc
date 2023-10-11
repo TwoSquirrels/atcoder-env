@@ -473,9 +473,9 @@ template <typename Key> using u_mset = std::unordered_multiset<Key>;
 template <typename Key, typename T> using u_map = std::unordered_map<Key, T>;
 template <typename Key, typename T> using u_mmap = std::unordered_multimap<Key, T>;
 template <size_t N> using bset = std::bitset<N>;
-#ifdef INCLUDED_CPP_INT
+#ifdef INCLUDED_BOOST_CPP_INT
 using bigint = boost::multiprecision::cpp_int;
-#endif // INCLUDED_CPP_INT
+#endif // INCLUDED_BOOST_CPP_INT
 
 using namespace std;
 #if __cplusplus >= 202002L && __has_include(<ranges>)
