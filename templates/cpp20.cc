@@ -182,7 +182,7 @@ long long powi(int base, int exponent = 2) {
 #ifdef INCLUDED_ACL
 template <typename T = atcoder::modint>
 T mint_inv(T x) {
-  constexpr size_t memo_limit = 1 << 24;
+  constexpr int memo_limit = 1 << 24;
   static std::array<T, memo_limit> memo;
   if (x.val() >= memo_limit) return x.inv();
   if (memo[x.val()] == 0) memo[x.val()] = x.inv();
@@ -217,7 +217,7 @@ template <typename T> bool is_prime(T n) {
   // trial
   T tried = 3;
 #ifdef INCLUDED_BOOST_PRIME
-  for (int i = 2; i <= boost::math::max_prime; i++) {
+  for (int i = 2; i <= int(boost::math::max_prime); i++) {
     const auto prime_i = boost::math::prime(i);
     if (prime_i > n / prime_i) return true;
     if (n % prime_i == 0) return false;
@@ -231,12 +231,12 @@ template <typename T> bool is_prime(T n) {
 }
 
 // thanks to https://perogram.hateblo.jp/entry/2019/03/29/193632
-template <bool osa_k = true, typename T> std::vector<std::pair<T, int>> factors(T n) {
-  constexpr size_t spf_limit = 1 << 24;
+template <bool osa_k = false, typename T> std::vector<std::pair<T, int>> factors(T n) {
+  constexpr int spf_limit = 1 << 24;
   std::vector<std::pair<T, int>> result;
   if (n < 0) {
     result.emplace_back(-1, 1);
-    auto natural = factors<osa_k, T>(-n);
+    const auto natural = factors<osa_k>(-n);
     result.insert(result.end(), natural.begin(), natural.end());
   } else if (n == 0) result.emplace_back(0, 1);
   else if (n == 1);
@@ -264,7 +264,7 @@ template <bool osa_k = true, typename T> std::vector<std::pair<T, int>> factors(
     if (expo != 0) result.emplace_back(3, expo);
     T tried = 3;
 #ifdef INCLUDED_BOOST_PRIME
-    for (int i = 2; i <= boost::math::max_prime; i++) {
+    for (int i = 2; i <= int(boost::math::max_prime); i++) {
       const auto prime_i = boost::math::prime(i);
       if (prime_i > n / prime_i) break;
       expo = 0;
@@ -272,7 +272,11 @@ template <bool osa_k = true, typename T> std::vector<std::pair<T, int>> factors(
       result.emplace_back(prime_i, expo);
       tried = prime_i;
     }
-    if (osa_k && n < spf_limit) { result.emplace_back(factors<T, osa_k>(n)); n = 1; }
+    if (osa_k && n < spf_limit) {
+      const auto rest = factors<osa_k>(n);
+      result.insert(result.end(), rest.begin(), rest.end());
+      n = 1;
+    }
 #endif // INCLUDED_BOOST_PRIME
     if (is_prime(n)) { result.emplace_back(n, 1); n = 1; }
     for (T i = (tried + 5) / 6 * 6; (i - 1) * (i - 1) <= n; i += 6) {
@@ -283,7 +287,7 @@ template <bool osa_k = true, typename T> std::vector<std::pair<T, int>> factors(
       while (n % (i + 1) == 0) { n /= (i + 1); expo++; }
       if (expo != 0) result.emplace_back(i + 1, expo);
       if (osa_k && n < spf_limit) {
-        auto rest = factors<osa_k, T>(n);
+        const auto rest = factors<osa_k>(n);
         result.insert(result.end(), rest.begin(), rest.end());
         n = 1;
       }
@@ -293,10 +297,19 @@ template <bool osa_k = true, typename T> std::vector<std::pair<T, int>> factors(
   return result;
 }
 
-// TODO: divisor enumeration
-//template <typename T> std::vector<T> divisors(T n) {
-//  return {};
-//}
+template <bool osa_k = false, typename T> std::vector<T> divisors(T n) {
+  std::vector<T> result(1, 1);
+  for (auto [prime, expo] : factors<osa_k>(n)) {
+    const int result_size = result.size();
+    T pow_i = 1;
+    for (int i = 1; i <= expo; i++) {
+      pow_i *= prime;
+      for (int k = 0; k < result_size; k++) result.emplace_back(result[k] * pow_i);
+    }
+  }
+  std::sort(result.begin(), result.end());
+  return result;
+}
 
 template <typename T> T fact(int n, bool inv = false) {
   assert(n >= 0);
