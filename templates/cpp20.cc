@@ -155,7 +155,7 @@ template <typename T> constexpr int sin45(T theta45) {
   return theta45 % 8 < 4 ? 1 : -1;
 }
 template <typename T> constexpr int cos45(T theta45) {
-  return sin90(theta45 + 2);
+  return sin45(theta45 + 2);
 }
 
 template <typename T, typename U> inline bool chmin(T &&a, const U b) {
