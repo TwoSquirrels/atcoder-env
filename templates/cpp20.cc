@@ -315,11 +315,20 @@ template <typename T> T fact(int n, bool inv = false) {
   assert(n >= 0);
   static std::vector<std::pair<T, T>> factorials = { { 1, 1 } };
   for (int i = factorials.size(); i <= n; i++) factorials.emplace_back(i * factorials[i - 1].first, 0);
-  if (inv && factorials[n].second == 0) factorials[n].second = mint_inv(factorials[n].first);
+  if (inv && factorials[n].second == 0) {
+    if constexpr (atcoder::internal::is_modint<T>::value) factorials[n].second = mint_inv(factorials[n].first);
+    else factorials[n].second = 1 / factorials[n].first;
+  }
   return inv ? factorials[n].second : factorials[n].first;
 }
 template <typename T> T perm(int n, int k) { return fact<T>(n) * fact<T>(n - k, true); }
 template <typename T> T comb(int n, int k) { return perm<T>(n, k) * fact<T>(k, true); }
+
+// TODO: compressor
+template <typename T> struct compressor {
+  std::vector<T> position;
+  compressor() = default;
+};
 
 template <typename T> std::vector<std::vector<T>> rotate(std::vector<std::vector<T>> grid, int angle = 1) {
   angle %= 4;
