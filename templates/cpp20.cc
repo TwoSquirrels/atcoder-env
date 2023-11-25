@@ -325,10 +325,13 @@ template <typename T> T perm(int n, int k) { return fact<T>(n) * fact<T>(n - k, 
 template <typename T> T comb(int n, int k) { return perm<T>(n, k) * fact<T>(k, true); }
 
 // TODO: compressor
-template <typename T> struct compressor {
-  std::vector<T> position;
+/*template <typename T> struct compressor {
+  std::vector<T> positions;
   compressor() = default;
-};
+  compressor(const std::vector<T> &initial_pos) {
+    
+  }
+};*/
 
 template <typename T> std::vector<std::vector<T>> rotate(std::vector<std::vector<T>> grid, int angle = 1) {
   angle %= 4;
@@ -505,7 +508,10 @@ void dump_stderr(std::string labels, std::tuple<Types...> targets_tupl, int line
 }
 #  define dump(...) (dump_stderr((#__VA_ARGS__), std::make_tuple(__VA_ARGS__), (__LINE__), (__FILE__)), true)
 #else // DEBUG
-#  define dump(...) (false)
+#  pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wunused-value"
+#    define dump(...) (false)
+#  pragma GCC diagnostic pop
 #endif // DEBUG
 
 /// main
@@ -552,7 +558,6 @@ using f32 = float; using f64 = double; using f128 = long double;
 using str = std::string;
 template <typename T> using vec = std::vector<T>;
 template <typename T> using deq = std::deque<T>;
-template <typename T> using list = std::list<T>;
 template <typename T, typename Compare = std::less<T>> using p_que = std::priority_queue<T, std::vector<T>, Compare>;
 template <typename Key, typename Compare = std::less<Key>> using mset = std::multiset<Key, Compare>;
 template <typename Key, typename T, typename Compare = std::less<Key>> using mmap = std::multimap<Key, T, Compare>;
@@ -575,15 +580,15 @@ using namespace atcoder;
 #endif // INCLUDED_ACL
 
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-variable"
+#  pragma GCC diagnostic ignored "-Wunused-variable"
 constexpr auto infi = inf<int>();
 constexpr auto infl = inf<long long>();
 constexpr auto infd = inf<double>();
 constexpr auto infld = inf<long double>();
-const std::array YN = { "No", "Yes" };
-const std::array AB = { "Bob", "Alice" };
-const std::array FS = { "Second", "First" };
-const std::array TA = { "Aoki", "Takahashi" };
+const std::array YN = { "No"s, "Yes"s };
+const std::array AB = { "Bob"s, "Alice"s };
+const std::array FS = { "Second"s, "First"s };
+const std::array TA = { "Aoki"s, "Takahashi"s };
 #pragma GCC diagnostic pop
 
 // functions
@@ -595,8 +600,6 @@ const std::array TA = { "Aoki", "Takahashi" };
 #define p1 first
 #define p2 second
 #define has contains
-#define bgn begin
-#define rbgn rbegin
 #define eb emplace_back
 #define ef emplace_front
 #define pb pop_back
