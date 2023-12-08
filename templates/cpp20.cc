@@ -145,14 +145,14 @@ template <typename T> constexpr T inf() {
 
 template <typename T> constexpr int sin90(T theta90) {
   if (theta90 % 2 == 0) return 0;
-  return theta90 % 4 < 2 ? 1 : -1;
+  return (theta90 % 4 + 4) % 4 < 2 ? 1 : -1;
 }
 template <typename T> constexpr int cos90(T theta90) {
   return sin90(theta90 + 1);
 }
 template <typename T> constexpr int sin45(T theta45) {
   if (theta45 % 4 == 0) return 0;
-  return theta45 % 8 < 4 ? 1 : -1;
+  return (theta45 % 8 + 8) % 8 < 4 ? 1 : -1;
 }
 template <typename T> constexpr int cos45(T theta45) {
   return sin45(theta45 + 2);
