@@ -557,7 +557,6 @@ using i128 = __int128; using u128 = unsigned __int128;
 using f32 = float; using f64 = double; using f128 = long double;
 using str = std::string;
 template <typename T> using vec = std::vector<T>;
-template <typename T> using deq = std::deque<T>;
 template <typename T, typename Compare = std::less<T>> using p_que = std::priority_queue<T, std::vector<T>, Compare>;
 template <typename Key, typename Compare = std::less<Key>> using mset = std::multiset<Key, Compare>;
 template <typename Key, typename T, typename Compare = std::less<Key>> using mmap = std::multimap<Key, T, Compare>;
@@ -565,7 +564,6 @@ template <typename Key> using u_set = std::unordered_set<Key>;
 template <typename Key> using u_mset = std::unordered_multiset<Key>;
 template <typename Key, typename T> using u_map = std::unordered_map<Key, T>;
 template <typename Key, typename T> using u_mmap = std::unordered_multimap<Key, T>;
-template <size_t N> using bset = std::bitset<N>;
 #ifdef INCLUDED_BOOST_CPP_INT
 using bigint = boost::multiprecision::cpp_int;
 #endif // INCLUDED_BOOST_CPP_INT
