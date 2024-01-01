@@ -475,42 +475,77 @@ template <typename T, typename Sep = char> inline void outputln(T target, Sep se
   write_stdout('\n', flush);
 }
 
-// dump
+// debug output
 #ifdef DEBUG
-std::chrono::milliseconds dump_total_ms{0};
-template <typename... Types>
-void dump_stderr(std::string labels, std::tuple<Types...> targets_tupl, int line = -1, std::string file = (__FILE__)) {
+std::chrono::milliseconds debug_total_ms{0};
+template <typename F> void debug_txt_f(F callback, int line = -1, std::string file = (__FILE__)) {
   using namespace std::chrono;
   const auto start = system_clock::now();
-  std::cerr << "[DEBUG] ";
+  std::string dump_str = "[DEBUG] ";
   if (line >= 0) {
-    std::cerr << "(";
-    if (file != (__FILE__)) std::cerr << file << ":";
-    std::cerr << "L" << line << ") ";
+    dump_str += "(";
+    if (file != (__FILE__)) dump_str += file + ":";
+    dump_str += "L" + std::to_string(line) + ") ";
   }
-  std::apply([labels](auto... targets) {
-    int i = 0, label_left = 0;
-    (([&](auto target) {
-      const auto label_len = labels.find(',', label_left) - label_left;
-      const auto label =
-        std::regex_replace(labels.substr(label_left, label_len),
-                           std::regex("^\\s+|\\s+$"), "");
-      if (i >= 1) std::cerr << ", ";
-      std::cerr << label << ": ";
-      std::cerr << to_pretty_str(target);
-      label_left += label_len + 1;
-      i++;
-    })(targets), ...);
-    std::cerr << ";" << std::endl;
-  }, targets_tupl);
+  dump_str += callback();
+  std::cerr << dump_str << std::endl;
   const auto end = system_clock::now();
-  dump_total_ms += duration_cast<milliseconds>(end - start);
+  debug_total_ms += duration_cast<milliseconds>(end - start);
 }
-#  define dump(...) (dump_stderr((#__VA_ARGS__), std::make_tuple(__VA_ARGS__), (__LINE__), (__FILE__)), true)
+#  define debug_txt(txt) (debug_txt_f([]() { return to_pretty_str(txt); }, (__LINE__), (__FILE__)), true)
+template <typename... Types>
+void dump_f(std::string labels, std::tuple<Types...> targets_tupl, int line = -1, std::string file = (__FILE__)) {
+  debug_txt_f([=]() {
+    std::string txt;
+    std::apply([labels, &txt](auto... targets) {
+      int i = 0, label_left = 0;
+      (([&](auto target) {
+        const auto label_len = labels.find(',', label_left) - label_left;
+        const auto label =
+          std::regex_replace(labels.substr(label_left, label_len),
+                             std::regex("^\\s+|\\s+$"), "");
+        if (i >= 1) txt += ", ";
+        txt += label + ": " + to_pretty_str(target);
+        label_left += label_len + 1;
+        i++;
+      })(targets), ...);
+      txt += ";";
+    }, targets_tupl);
+    return txt;
+  }, line, file);
+}
+#  define dump(...) (dump_f((#__VA_ARGS__), std::make_tuple(__VA_ARGS__), (__LINE__), (__FILE__)), true)
+void dump_canvas_f(std::string label, std::vector<std::string> canvas, int line = -1, std::string file = (__FILE__)) {
+  debug_txt_f([=]() {
+    int h = canvas.size(), w = canvas[0].size();
+    std::string txt = label + " (" + std::to_string(h) + " x " + std::to_string(w) + ")\n";
+    std::string ruler0(w, ' '), ruler1(w, '-');
+    for (int x = 0; x < w; x += 4) {
+      auto x_s = std::to_string(x);
+      for (std::size_t i = 0; i < x_s.size(); i++) ruler0[x - i] = x_s[x_s.size() - i - 1];
+      ruler1[x] = '+';
+    }
+    txt += "   |" + ruler0 + "\n---+" + ruler1;
+    for (int y = 0; y < h; y++) {
+      std::string ruler = "   |";
+      if (y % 4 == 0) {
+        auto y_s = std::to_string(y);
+        for (std::size_t i = 0; i < y_s.size(); i++) ruler[2 - i] = y_s[y_s.size() - i - 1];
+        ruler[3] = '+';
+      }
+      txt += "\n" + ruler + canvas[y];
+    }
+    return txt;
+  }, line, file);
+}
+#  define dump_canvas(canvas) (dump_canvas_f((#canvas), (canvas), (__LINE__), (__FILE__)), true)
+// TODO: dump_table
 #else // DEBUG
 #  pragma GCC diagnostic push
 #    pragma GCC diagnostic ignored "-Wunused-value"
+#    define debug_txt(...) (false)
 #    define dump(...) (false)
+#    define dump_canvas(...) (false)
 #  pragma GCC diagnostic pop
 #endif // DEBUG
 
@@ -541,7 +576,7 @@ int main() {
     cerr << "[ERROR] " << e.what() << endl;
   }
   const auto end = system_clock::now();
-  const auto time_ms = duration_cast<milliseconds>(end - start) - input_total_ms - dump_total_ms;
+  const auto time_ms = duration_cast<milliseconds>(end - start) - input_total_ms - debug_total_ms;
   cerr << "[INFO] finished in " << time_ms.count() << " ms!" << endl;
 #  endif // DEBUG
   return 0;
