@@ -640,7 +640,7 @@ const std::array TA = { "Aoki"s, "Takahashi"s };
 // repeat
 #define reps(i, l, r) for (std::decay_t<decltype(r)> i##_right = (r), i = (l); i < i##_right; i++)
 #define rep(i, n) reps(i, 0, n)
-#define rreps(i, l, r) for (std::decay_t<decltype(l)> i##_left = (l), i = (r) - 1; i >= i##_left; i--)
+#define rreps(i, l, r) for (std::decay_t<decltype(r)> i##_left = (l), i = (r) - 1; i >= i##_left; i--)
 #define rrep(i, n) rreps(i, 0, n)
 #define each(for_able) for (auto &&for_able##_i : (for_able))
 // iterate
