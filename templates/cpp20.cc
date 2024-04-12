@@ -316,7 +316,10 @@ template <typename T> T fact(int n, bool inv = false) {
   static std::vector<std::pair<T, T>> factorials = { { 1, 1 } };
   for (int i = factorials.size(); i <= n; i++) factorials.emplace_back(i * factorials[i - 1].first, 0);
   if (inv && factorials[n].second == 0) {
-    if constexpr (atcoder::internal::is_modint<T>::value) factorials[n].second = mint_inv(factorials[n].first);
+    if constexpr (std::is_integral_v<T>) factorials[n].second = factorials[n].first <= 1 ? 1 : 0;
+#ifdef INCLUDED_ACL
+    else if constexpr (atcoder::internal::is_modint<T>::value) factorials[n].second = mint_inv(factorials[n].first);
+#endif // INCLUDED_ACL
     else factorials[n].second = 1 / factorials[n].first;
   }
   return inv ? factorials[n].second : factorials[n].first;
