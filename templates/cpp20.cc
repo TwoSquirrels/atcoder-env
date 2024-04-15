@@ -2,7 +2,7 @@
 // (c) 2023 TwoSquirrels
 // my AtCoder environment: https://github.com/TwoSquirrels/atcoder-env
 
-//#define DEBUG
+#define DEBUG
 
 // enable debug mode when compiled with -DDEBUG
 #ifdef DEBUG
@@ -640,6 +640,8 @@ const std::array TA = { "Aoki"s, "Takahashi"s };
 #define ef emplace_front
 #define pb pop_back
 #define pf pop_front
+// cast
+#define bit_width(x) (int(std::bit_width(x)))
 // repeat
 #define reps(i, l, r) for (std::decay_t<decltype(r)> i##_right = (r), i = (l); i < i##_right; i++)
 #define rep(i, n) reps(i, 0, n)
