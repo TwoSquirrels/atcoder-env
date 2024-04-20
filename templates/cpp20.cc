@@ -2,7 +2,7 @@
 // (c) 2023 TwoSquirrels
 // my AtCoder environment: https://github.com/TwoSquirrels/atcoder-env
 
-#define DEBUG
+//#define DEBUG
 
 // enable debug mode when compiled with -DDEBUG
 #ifdef DEBUG
