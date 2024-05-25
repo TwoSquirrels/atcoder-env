@@ -560,8 +560,8 @@ inline std::string cp_main();
 
 int main() {
   using namespace std;
-  using namespace std::chrono;
 #  ifdef DEBUG
+  using namespace std::chrono;
   cerr << "[INFO] running in debug mode!" << endl;
   const auto start = system_clock::now();
   try {
@@ -592,7 +592,7 @@ int main() {
 using i32 = int; using u32 = unsigned int;
 using i64 = long long; using u64 = unsigned long long;
 using i128 = __int128; using u128 = unsigned __int128;
-using f32 = float; using f64 = double; using f128 = long double;
+using f32 = float; using f64 = double; using f80 = long double;
 using str = std::string;
 template <typename T> using vec = std::vector<T>;
 template <typename T, typename Compare = std::less<T>> using p_que = std::priority_queue<T, std::vector<T>, Compare>;
