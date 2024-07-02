@@ -21,13 +21,6 @@ array sin45 = { 0, 1, 1, 1, 0, -1, -1, -1 }, cos45 = { 1, 1, 0, -1, -1, -1, 0, 1
 #define sz(a) ssize(a)
 template <typename T> inline constexpr bool is_pair_v = false;
 template <typename T, typename U> inline constexpr bool is_pair_v<pair<T, U>> = true;
-template <typename T> inline constexpr bool is_tuple_v = false;
-template <typename... Types> inline constexpr bool is_tuple_v<tuple<Types...>> = true;
-template<typename T, typename = void> inline constexpr bool istreamable_v = false;
-template<typename T> inline constexpr bool istreamable_v<T, void_t<decltype(cin >> declval<T&>())>> = true;
-template<typename T, typename = void> inline constexpr bool ostreamable_v = false;
-template<typename T> inline constexpr bool ostreamable_v<T, void_t<decltype(cout << declval<T&>())>> = true;
-template <typename T> inline constexpr bool iterable_v = is_same_v<decltype(begin(declval<T>())), decltype(end(declval<T>()))>;
 template <typename T> inline string get_typename(size_t length_limit = string::npos) {
   string name = abi::__cxa_demangle(typeid(T).name(), nullptr, nullptr, nullptr);
   if (name.length() > length_limit) name = name.substr(0, length_limit - 3) + "...";
@@ -64,7 +57,7 @@ template <typename T> string to_pretty_str(T target) {
     bool separate = false;
     for (const auto &target_i : target) { if (separate) str += ", "s; str += to_pretty_str(target_i); separate = true; }
     str += "]"s;
-  } else if constexpr (iterable_v<T>) {
+  } else if constexpr (is_same_v<decltype(begin(declval<T>())), decltype(end(declval<T>()))>) {
     str += "("s + get_typename<T>(20) + "){"s;
     bool separate = false;
     for (const auto &target_i : target) { if (separate) str += ","s; str += " "s + to_pretty_str(target_i); separate = true; }
