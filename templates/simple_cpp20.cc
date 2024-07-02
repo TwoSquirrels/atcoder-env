@@ -65,7 +65,7 @@ template <typename T> string to_pretty_str(T target) {
     for (const auto &target_i : target) { if (separate) str += ", "s; str += to_pretty_str(target_i); separate = true; }
     str += "]"s;
   } else if constexpr (iterable_v<T>) {
-    str += get_typename<T>(20) + "{"s;
+    str += "("s + get_typename<T>(20) + "){"s;
     bool separate = false;
     for (const auto &target_i : target) { if (separate) str += ","s; str += " "s + to_pretty_str(target_i); separate = true; }
     if (separate) str += " "s;

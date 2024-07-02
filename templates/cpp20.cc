@@ -391,7 +391,7 @@ template <typename T> std::string to_pretty_str(T target) {
     }
     str += "]"s;
   } else if constexpr (iterable_v<T>) {
-    str += get_typename<T>(20) + "{"s;
+    str += "("s + get_typename<T>(20) + "){"s;
     bool separate = false;
     for (const auto &target_i : target) {
       if (separate) str += ","s;
