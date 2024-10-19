@@ -217,7 +217,7 @@ template <typename T> bool is_prime(T n) {
   // trial
   T tried = 3;
 #ifdef INCLUDED_BOOST_PRIME
-  for (int i = 2; i <= int(boost::math::max_prime); i++) {
+  for (int i = 2; i <= int(boost::math::max_prime); ++i) {
     const auto prime_i = boost::math::prime(i);
     if (prime_i > n / prime_i) return true;
     if (n % prime_i == 0) return false;
@@ -243,7 +243,7 @@ template <bool osa_k = false, typename T> std::vector<std::pair<T, int>> factors
   else if (osa_k && n < spf_limit) {
     static std::array<int, spf_limit> spf;
     if (spf[0] == 0) {
-      for (int i = 0; i < spf_limit; i++) spf[i] = i % 2 == 0 ? 2 : i % 3 == 0 ? 3 : i;
+      for (int i = 0; i < spf_limit; ++i) spf[i] = i % 2 == 0 ? 2 : i % 3 == 0 ? 3 : i;
       spf[0] = 1;
       for (int p1 = 6; (p1 - 1) * (p1 - 1) <= spf_limit; p1 += 6) {
         if (spf[p1 - 1] == p1 - 1) for (int i = p1 - 1; i < spf_limit; i += p1 - 1) if (spf[i] == i) spf[i] = p1 - 1;
@@ -251,24 +251,24 @@ template <bool osa_k = false, typename T> std::vector<std::pair<T, int>> factors
       }
     }
     while (n != 1) {
-      if (!result.empty() && result.back().first == spf[n]) result.back().second++;
+      if (!result.empty() && result.back().first == spf[n]) ++result.back().second;
       else result.emplace_back(spf[n], 1);
       n /= spf[n];
     }
   } else {
     int expo = 0;
-    while (n % 2 == 0) { n /= 2; expo++; }
+    while (n % 2 == 0) { n /= 2; ++expo; }
     if (expo != 0) result.emplace_back(2, expo);
     expo = 0;
-    while (n % 3 == 0) { n /= 3; expo++; }
+    while (n % 3 == 0) { n /= 3; ++expo; }
     if (expo != 0) result.emplace_back(3, expo);
     T tried = 3;
 #ifdef INCLUDED_BOOST_PRIME
-    for (int i = 2; i <= int(boost::math::max_prime); i++) {
+    for (int i = 2; i <= int(boost::math::max_prime); ++i) {
       const auto prime_i = boost::math::prime(i);
       if (prime_i > n / prime_i) break;
       expo = 0;
-      while (n % prime_i == 0) { n /= prime_i; expo++; }
+      while (n % prime_i == 0) { n /= prime_i; ++expo; }
       result.emplace_back(prime_i, expo);
       tried = prime_i;
     }
@@ -281,10 +281,10 @@ template <bool osa_k = false, typename T> std::vector<std::pair<T, int>> factors
     if (is_prime(n)) { result.emplace_back(n, 1); n = 1; }
     for (T i = (tried + 5) / 6 * 6; (i - 1) * (i - 1) <= n; i += 6) {
       expo = 0;
-      while (n % (i - 1) == 0) { n /= (i - 1); expo++; }
+      while (n % (i - 1) == 0) { n /= (i - 1); ++expo; }
       if (expo != 0) result.emplace_back(i - 1, expo);
       expo = 0;
-      while (n % (i + 1) == 0) { n /= (i + 1); expo++; }
+      while (n % (i + 1) == 0) { n /= (i + 1); ++expo; }
       if (expo != 0) result.emplace_back(i + 1, expo);
       if (osa_k && n < spf_limit) {
         const auto rest = factors<osa_k>(n);
@@ -302,9 +302,9 @@ template <bool osa_k = false, typename T> std::vector<T> divisors(T n) {
   for (auto [prime, expo] : factors<osa_k>(n)) {
     const int result_size = result.size();
     T pow_i = 1;
-    for (int i = 1; i <= expo; i++) {
+    for (int i = 1; i <= expo; ++i) {
       pow_i *= prime;
-      for (int k = 0; k < result_size; k++) result.emplace_back(result[k] * pow_i);
+      for (int k = 0; k < result_size; ++k) result.emplace_back(result[k] * pow_i);
     }
   }
   std::sort(result.begin(), result.end());
@@ -314,7 +314,7 @@ template <bool osa_k = false, typename T> std::vector<T> divisors(T n) {
 template <typename T> T fact(int n, bool inv = false) {
   assert(n >= 0);
   static std::vector<std::pair<T, T>> factorials = { { 1, 1 } };
-  for (int i = factorials.size(); i <= n; i++) factorials.emplace_back(i * factorials[i - 1].first, 0);
+  for (int i = factorials.size(); i <= n; ++i) factorials.emplace_back(i * factorials[i - 1].first, 0);
   if (inv && factorials[n].second == 0) {
     if constexpr (std::is_integral_v<T>) factorials[n].second = factorials[n].first <= 1 ? 1 : 0;
 #ifdef INCLUDED_ACL
@@ -341,7 +341,7 @@ template <typename T> std::vector<std::vector<T>> rotate(std::vector<std::vector
   if (angle == 0) return grid;
   auto h = grid.size(), w = grid[0].size();
   auto rotated = std::vector(w, std::vector<T>(h));
-  for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) rotated[w - 1 - x][y] = grid[y][x];
+  for (int y = 0; y < h; ++y) for (int x = 0; x < w; ++x) rotated[w - 1 - x][y] = grid[y][x];
   return rotate(rotated, angle - 1);
 }
 
@@ -510,7 +510,7 @@ void dump_f(std::string labels, std::tuple<Types...> targets_tupl, int line = -1
         if (i >= 1) txt += ", ";
         txt += label + ": " + to_pretty_str(target);
         label_left += label_len + 1;
-        i++;
+        ++i;
       })(targets), ...);
       txt += ";";
     }, targets_tupl);
@@ -525,15 +525,15 @@ void dump_canvas_f(std::string label, std::vector<std::string> canvas, int line 
     std::string ruler0(w, ' '), ruler1(w, '-');
     for (int x = 0; x < w; x += 4) {
       auto x_s = std::to_string(x);
-      for (std::size_t i = 0; i < x_s.size(); i++) ruler0[x - i] = x_s[x_s.size() - i - 1];
+      for (std::size_t i = 0; i < x_s.size(); ++i) ruler0[x - i] = x_s[x_s.size() - i - 1];
       ruler1[x] = '+';
     }
     txt += "   |" + ruler0 + "\n---+" + ruler1;
-    for (int y = 0; y < h; y++) {
+    for (int y = 0; y < h; ++y) {
       std::string ruler = "   |";
       if (y % 4 == 0) {
         auto y_s = std::to_string(y);
-        for (std::size_t i = 0; i < y_s.size(); i++) ruler[2 - i] = y_s[y_s.size() - i - 1];
+        for (std::size_t i = 0; i < y_s.size(); ++i) ruler[2 - i] = y_s[y_s.size() - i - 1];
         ruler[3] = '+';
       }
       txt += "\n" + ruler + canvas[y];
@@ -641,11 +641,12 @@ const std::array TA = { "Aoki"s, "Takahashi"s };
 #define pb pop_back
 #define pf pop_front
 // cast
+#define sz(x) (int(std::ssize(x)))
 #define bit_width(x) (int(std::bit_width(x)))
 // repeat
-#define reps(i, l, r) for (std::decay_t<decltype(r)> i##_right = (r), i = (l); i < i##_right; i++)
+#define reps(i, l, r) for (std::decay_t<decltype(r)> i##_right = (r), i = (l); i < i##_right; ++i)
 #define rep(i, n) reps(i, 0, n)
-#define rreps(i, l, r) for (std::decay_t<decltype(r)> i##_left = (l), i = (r) - 1; i >= i##_left; i--)
+#define rreps(i, l, r) for (std::decay_t<decltype(r)> i##_left = (l), i = (r) - 1; i >= i##_left; --i)
 #define rrep(i, n) rreps(i, 0, n)
 #define each(for_able) for (auto &&for_able##_i : (for_able))
 // iterate

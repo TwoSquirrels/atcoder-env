@@ -13,9 +13,9 @@ array sin90 = { 0, 1, 0, -1 }, cos90 = { 1, 0, -1, 0 };
 array sin45 = { 0, 1, 1, 1, 0, -1, -1, -1 }, cos45 = { 1, 1, 0, -1, -1, -1, 0, 1 };
 #define p1 first
 #define p2 second
-#define reps(i, l, r) for (decay_t<decltype(r)> i##_right = (r), i = (l); i < i##_right; i++)
+#define reps(i, l, r) for (decay_t<decltype(r)> i##_right = (r), i = (l); i < i##_right; ++i)
 #define rep(i, n) reps(i, 0, n)
-#define rreps(i, l, r) for (decay_t<decltype(r)> i##_left = (l), i = (r) - 1; i >= i##_left; i--)
+#define rreps(i, l, r) for (decay_t<decltype(r)> i##_left = (l), i = (r) - 1; i >= i##_left; --i)
 #define rrep(i, n) rreps(i, 0, n)
 #define all(a) begin(a), end(a)
 #define sz(a) ssize(a)
@@ -89,7 +89,7 @@ void dump_f(string labels, tuple<Types...> targets_tupl, int line = -1, string f
         if (i >= 1) txt += ", ";
         txt += regex_replace(labels.substr(label_left, label_len), regex("^\\s+|\\s+$"), "") + ": " + to_pretty_str(target);
         label_left += label_len + 1;
-        i++;
+        ++i;
       })(targets), ...);
       txt += ";";
     }, targets_tupl);
