@@ -28,6 +28,35 @@ template <typename T> inline string get_typename(size_t length_limit = string::n
 }
 bool chmin(auto& a, auto b) { return a > b ? a = b, 1 : 0; }
 bool chmax(auto& a, auto b) { return a < b ? a = b, 1 : 0; }
+template<uint64_t seed = 19650218uLL> uint64_t mt_rand() {
+  static array<uint64_t, 312> mt{};
+  static size_t index = 312;
+  if (index == 312) {
+    mt[0] = seed;
+    reps(i, 1, 312) mt[i] = 6364136223846793005uLL * (mt[i - 1] ^ mt[i - 1] >> 62) + i;
+    index = 0;
+  }
+  if (index == 0) {
+    rep(i, 312) {
+      const uint64_t x = (mt[i] & 0xFFFFFFFF80000000uLL) | (mt[(i + 1) % 312] & 0x7FFFFFFFuLL);
+      mt[i] = mt[(i + 156) % 312] ^ x >> 1;
+      if (x % 2 != 0) mt[i] ^= 0xB5026F5AA96619E9uLL;
+    }
+  }
+  uint64_t x = mt[index];
+  x ^= x >> 29 & 0x5555555555555555uLL;
+  x ^= x << 17 & 0x71D67FFFEDA60000uLL;
+  x ^= x << 37 & 0xFFF7EEE000000000uLL;
+  x ^= x >> 43;
+  index = (index + 1) % 312;
+  return x;
+}
+template<uint64_t seed = 19650218uLL> double mt_rand_d() {
+  return (mt_rand<seed>() >> 11) * (1.0 / 9007199254740992.0);
+}
+template<uint64_t seed = 19650218uLL> double mt_rand_n(double mu = 0.0, double sigma = 1.0) {
+  return mu + sigma * sqrt(-2.0 * log(mt_rand_d<seed>())) * sin(2.0 * std::numbers::pi * mt_rand_d<seed>());
+}
 string int128_to_str(__int128_t target) {
   string target_str;
   __uint128_t target_tmp = target < 0 ? -target : target;
@@ -101,6 +130,8 @@ void dump_f(string labels, tuple<Types...> targets_tupl, int line = -1, string f
 #  define debug_txt(...) (false)
 #  define dump(...) (false)
 #endif
+
+// ================================ ANSWER ================================
 
 int main() {
   cin.tie(nullptr);
