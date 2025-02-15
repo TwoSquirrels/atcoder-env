@@ -568,7 +568,7 @@ int main() {
 #  endif // DEBUG
     cin.tie(nullptr);
     ios_base::sync_with_stdio(false);
-    cout << fixed << setprecision(8);
+    cout << fixed << setprecision(12);
     // run!!!
     const auto result = cp_main();
     if (!result.empty()) write_stdout(result);

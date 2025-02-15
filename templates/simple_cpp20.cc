@@ -136,7 +136,7 @@ void dump_f(string labels, tuple<Types...> targets_tupl, int line = -1, string f
 int main() {
   cin.tie(nullptr);
   ios_base::sync_with_stdio(false);
-  cout << fixed << setprecision(8);
+  cout << fixed << setprecision(12);
 
   cout << "Hello, C++!" << endl;
 }
