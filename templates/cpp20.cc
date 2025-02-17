@@ -297,7 +297,7 @@ template <bool osa_k = false, typename T> std::vector<std::pair<T, int>> factors
   return result;
 }
 
-template <bool osa_k = false, typename T> std::vector<T> divisors(T n) {
+template <bool osa_k = false, typename T> std::vector<T> divisors(T n, bool sorted = true) {
   std::vector<T> result(1, 1);
   for (auto [prime, expo] : factors<osa_k>(n)) {
     const int result_size = result.size();
@@ -307,7 +307,7 @@ template <bool osa_k = false, typename T> std::vector<T> divisors(T n) {
       for (int k = 0; k < result_size; ++k) result.emplace_back(result[k] * pow_i);
     }
   }
-  std::sort(result.begin(), result.end());
+  if (sorted) std::sort(result.begin(), result.end());
   return result;
 }
 
