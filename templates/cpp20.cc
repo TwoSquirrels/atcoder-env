@@ -629,13 +629,8 @@ const std::array TA = { "Aoki"s, "Takahashi"s };
 
 // functions
 #define tostr to_string
-#define dist distance
-#define min_e min_element
-#define max_e max_element
-#define iota_v iota_view
 #define p1 first
 #define p2 second
-#define has contains
 #define eb emplace_back
 #define ef emplace_front
 #define pb pop_back
@@ -651,10 +646,6 @@ const std::array TA = { "Aoki"s, "Takahashi"s };
 #define each(for_able) for (auto &&for_able##_i : (for_able))
 // iterate
 #define all(for_able) (std::begin(for_able)), (std::end(for_able))
-#define rev(for_able) (std::rbegin(for_able)), (std::rend(for_able))
-// lambda
-#define pred(x, expr) ([&](auto &&x) -> bool { return (expr); })
-#define comp(x, y, expr) ([&](auto &&x, auto &&y) -> bool { return (expr); })
 
 /// answer
 
