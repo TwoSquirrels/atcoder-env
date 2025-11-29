@@ -495,7 +495,7 @@ template <typename F> void debug_txt_f(F callback, int line = -1, std::string fi
   const auto end = system_clock::now();
   debug_total_ms += duration_cast<milliseconds>(end - start);
 }
-#  define debug_txt(txt) (debug_txt_f([]() { return to_pretty_str(txt); }, (__LINE__), (__FILE__)), true)
+#  define debug_txt(txt) (debug_txt_f([&]() { return to_pretty_str(txt); }, (__LINE__), (__FILE__)), true)
 template <typename... Types>
 void dump_f(std::string labels, std::tuple<Types...> targets_tupl, int line = -1, std::string file = (__FILE__)) {
   debug_txt_f([=]() {

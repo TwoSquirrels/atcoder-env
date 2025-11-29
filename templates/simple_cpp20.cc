@@ -106,7 +106,7 @@ template <typename F> void debug_txt_f(F callback, int line = -1, string file = 
   dump_str += callback();
   cerr << dump_str << endl;
 }
-#  define debug_txt(txt) (debug_txt_f([]() { return to_pretty_str(txt); }, (__LINE__), (__FILE__)), true)
+#  define debug_txt(txt) (debug_txt_f([&]() { return to_pretty_str(txt); }, (__LINE__), (__FILE__)), true)
 template <typename... Types>
 void dump_f(string labels, tuple<Types...> targets_tupl, int line = -1, string file = (__FILE__)) {
   debug_txt_f([=]() {
