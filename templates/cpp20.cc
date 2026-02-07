@@ -376,6 +376,10 @@ template <typename T> std::string to_pretty_str(T target) {
     if constexpr (is_same_v<remove_cv_t<T>, long>) str += "L"s;
     else if constexpr (is_same_v<remove_cv_t<T>, long long>) str += "LL"s;
     else if constexpr (is_same_v<T, __int128_t>) str += "LLL"s;
+    if constexpr (std::numeric_limits<T>::is_specialized) {
+      if (target >= inf<T>()) str = "inf"s;
+      else if constexpr (std::is_signed_v<T>) if (target <= -inf<T>()) str = "-inf"s;
+    }
   } else if constexpr (is_pair_v<T>) {
     str += "("s + to_pretty_str(target.first);
     str += ", "s + to_pretty_str(target.second) + ")"s;
@@ -542,13 +546,45 @@ void dump_canvas_f(std::string label, std::vector<std::string> canvas, int line 
   }, line, file);
 }
 #  define dump_canvas(canvas) (dump_canvas_f((#canvas), (canvas), (__LINE__), (__FILE__)), true)
-// TODO: dump_table
+// TODO: fix
+template <typename T>
+void dump_table_f(std::string label, const std::vector<std::vector<T>> &table, int line = -1, std::string file = (__FILE__)) {
+  debug_txt_f([&]() {
+    if (table.empty()) return label + ": empty table";
+    int h = table.size(), w = table[0].empty() ? 0 : table[0].size();
+    std::vector<std::vector<std::string>> s_table(h, std::vector<std::string>(w));
+    std::vector<int> col_width(w);
+    for (int x = 0; x < w; ++x) col_width[x] = std::to_string(x).length();
+    for (int y = 0; y < h; ++y) {
+      for (int x = 0; x < w; ++x) {
+        s_table[y][x] = to_pretty_str(table[y][x]);
+        chmax(col_width[x], (int)s_table[y][x].length());
+      }
+    }
+    int row_idx_width = std::to_string(h - 1).length();
+    std::stringstream ss;
+    ss << label << " (" << h << " x " << w << ")\n";
+    ss << std::string(row_idx_width + 2, ' ');
+    for (int x = 0; x < w; ++x) ss << " " << std::setw(col_width[x]) << x;
+    ss << "\n" << std::string(row_idx_width + 2, ' ') << "+";
+    for (int x = 0; x < w; ++x) ss << std::string(col_width[x] + 1, '-') << ((x == w - 1) ? "+" : "");
+    ss << "\n";
+    for (int y = 0; y < h; ++y) {
+      ss << " " << std::setw(row_idx_width) << y << "|";
+      for (int x = 0; x < w; ++x) ss << " " << std::setw(col_width[x]) << s_table[y][x];
+      ss << "\n";
+    }
+    return ss.str();
+  }, line, file);
+}
+# define dump_table(table) (dump_table_f((#table), (table), (__LINE__), (__FILE__)), true)
 #else // DEBUG
 #  pragma GCC diagnostic push
 #    pragma GCC diagnostic ignored "-Wunused-value"
 #    define debug_txt(...) (false)
 #    define dump(...) (false)
 #    define dump_canvas(...) (false)
+#    define dump_table(...) (false)
 #  pragma GCC diagnostic pop
 #endif // DEBUG
 
