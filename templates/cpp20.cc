@@ -8,59 +8,91 @@
 #ifdef DEBUG
 #  define IS_DEBUG (1)
 #else
-// QCFium method
-#  pragma GCC target("avx2")
-#  pragma GCC optimize("O3")
-#  pragma GCC optimize("unroll-loops")
-#  pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx")
+#  pragma GCC optimize("O3,unroll-loops")
 #  define IS_DEBUG (0)
 #endif
 
 /// includes
 
-// standard libraries
-#if __has_include(<bits/stdc++.h>)
-#  include <bits/stdc++.h>
-#else // <bits/stdc++.h>
-// C++17 (clang)
-#  include <cassert>
-#  include <cfenv>
-#  include <cfloat>
-#  include <ciso646>
-#  include <clocale>
-#  include <csetjmp>
-#  include <csignal>
-#  include <cstdbool>
-#  include <cinttypes>
-#  include <charconv>
-#  include <typeindex>
-#  include <any>
-#  include <scoped_allocator>
-#  include <forward_list>
-#  include <list>
-#  include <map>
-#  include <set>
-#  include <valarray>
-#  include <variant>
-#  include <unordered_map>
-#  include <unordered_set>
-#  include <queue>
-#  include <condition_variable>
-#  include <shared_mutex>
-#  include <codecvt>
-#  include <future>
-#  include <regex>
-#  include <iostream>
-#  include <random>
-#  include <ctgmath>
-#  include <fstream>
-#endif // <bits/stdc++.h>
+// C-style
+#include <cassert>
+#include <cctype>
+#include <cfloat>
+#include <climits>
+#include <cmath>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 
-/// abi
+// Containers
+#include <array>
+#include <deque>
+#include <forward_list>
+#include <list>
+#include <map>
+#include <queue>
+#include <set>
+#include <stack>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+
+// Math
+#include <algorithm>
+#include <bitset>
+#include <complex>
+#include <functional>
+#include <limits>
+#include <numeric>
+#include <random>
+#include <valarray>
+
+// IO
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+
+// Utilities
+#include <chrono>
+#include <iterator>
+#include <memory>
+#include <optional>
+#include <regex>
+#include <string_view>
+#include <thread>
+#include <tuple>
+#include <type_traits>
+#include <utility>
+#include <variant>
+
+// C++20
+#if __cplusplus >= 202002L
+#  include <bit>
+#  include <compare>
+#  include <concepts>
+#  include <numbers>
+#  include <ranges>
+#  include <span>
+#  include <source_location>
+#endif
+
+// Modern C++
+#if __has_include(<format>)
+#  include <format>
+#endif
+#if __has_include(<print>)
+#  include <print>
+#endif
+
+// abi
 #if __has_include(<cxxabi.h>)
 #  define INCLUDED_CXXABI
 #  include <cxxabi.h>
-#endif // <cxxabi.h>
+#endif
 
 // boost libraries
 #if __has_include(<boost/multiprecision/cpp_int.hpp>)
@@ -74,6 +106,10 @@
 #if __has_include(<boost/multiprecision/miller_rabin.hpp>)
 #  define INCLUDED_BOOST_MILLER_RABIN
 #  include <boost/multiprecision/miller_rabin.hpp>
+#endif
+
+#ifndef DEBUG
+#  pragma GCC target("avx2,bmi2,popcnt,lzcnt")
 #endif
 
 // atcoder libraries

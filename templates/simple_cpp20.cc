@@ -1,8 +1,10 @@
+#pragma GCC optimize("O3,unroll-loops")
 #include <bits/stdc++.h>
 #include <cxxabi.h>
-#include <atcoder/all>
+#pragma GCC target("avx2,bmi2,popcnt,lzcnt")
+//#include <atcoder/all>
 using namespace std;
-using namespace atcoder;
+//using namespace atcoder;
 using ll = long long;
 const ll INF = 4e18;
 using ld = long double;
@@ -71,14 +73,12 @@ template <typename T> string to_pretty_str(T target) {
   else if constexpr (is_null_pointer_v<T>) str += "null"s;
   else if constexpr (is_same_v<T, bool>) str += target ? "true"s : "false"s;
   else if constexpr (is_same_v<T, char> || is_same_v<T, char16_t> || is_same_v<T, char32_t> || is_same_v<T, wchar_t>) str += "'"s + target + "'"s;
-  else if constexpr (atcoder::internal::is_modint<T>::value) str += to_string(target.val()) + "(mod)"s;
+  //else if constexpr (atcoder::internal::is_modint<T>::value) str += to_string(target.val()) + "(mod)"s;
   else if constexpr (is_arithmetic_v<T>) {
     if constexpr (is_same_v<T, __int128_t>) str += int128_to_str(target);
+    else if (target >= INF) str += "INF"s;
+    else if constexpr (is_signed_v<T>) if (target <= -INF) str = "-INF"s;
     else str += to_string(target);
-    if constexpr (is_unsigned_v<T>) str += "u"s;
-    if constexpr (is_same_v<remove_cv_t<T>, long>) str += "L"s;
-    else if constexpr (is_same_v<remove_cv_t<T>, long long>) str += "LL"s;
-    else if constexpr (is_same_v<T, __int128_t>) str += "LLL"s;
   } else if constexpr (is_pair_v<T>) str += "("s + to_pretty_str(target.first) + ", "s + to_pretty_str(target.second) + ")"s;
   else if constexpr (is_convertible_v<T, string>) str += "\""s + target + "\""s;
   else if constexpr (is_array_v<T>) {
