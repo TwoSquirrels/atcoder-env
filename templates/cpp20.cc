@@ -360,8 +360,16 @@ template <typename T> T fact(int n, bool inv = false) {
   }
   return inv ? factorials[n].second : factorials[n].first;
 }
-template <typename T> T perm(int n, int k) { return fact<T>(n) * fact<T>(n - k, true); }
-template <typename T> T comb(int n, int k) { return perm<T>(n, k) * fact<T>(k, true); }
+template <typename T> T perm(long long n, int k) {
+  if (n <= 5000000) return fact<T>(n) * fact<T>(n - k, true);
+  T res = 1;
+  for (long long i = n; i > k; --i) res *= i;
+  return res;
+}
+template <typename T> T comb(long long n, int k) {
+  if (n - k < k) k = n - k;
+  return perm<T>(n, k) * fact<T>(k, true);
+}
 
 // TODO: compressor
 /*template <typename T> struct compressor {
@@ -708,7 +716,7 @@ const std::array TA = { "Aoki"s, "Takahashi"s };
 #define pb pop_back
 #define pf pop_front
 // cast
-#define sz(x) (int(std::ssize(x)))
+#define sz(x) (i64(std::ssize(x)))
 #define bit_width(x) (int(std::bit_width(x)))
 // repeat
 #define reps(i, l, r) for (std::decay_t<decltype(r)> i##_right = (r), i = (l); i < i##_right; ++i)
