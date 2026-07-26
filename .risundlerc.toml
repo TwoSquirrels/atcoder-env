@@ -1,0 +1,6 @@
+[compiler]
+path = "g++"
+options = ["-std=gnu++20"]
+
+[library]
+keep = ["std", "ac-library"]

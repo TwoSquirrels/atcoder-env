@@ -9,7 +9,13 @@
 
 !run/
 !run/*
+!bundle/
+!bundle/*
 !templates/
 !templates/*
+!libs/
+!libs/**
 
 !CMakeLists.txt
+!.risundlerc.toml
+!pch.hpp
