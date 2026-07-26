@@ -2,12 +2,14 @@
 
 #include <risu/prelude.hpp>
 #include <risu/util/traits/is_pair.hpp>
+#include <risu/util/traits/is_tuple.hpp>
 #include <risu/util/traits/iterable.hpp>
 #include <risu/util/traits/ostreamable.hpp>
 #include <risu/util/int128.hpp>
 
 #include <concepts>
 #include <iostream>
+#include <tuple>
 #if __has_include(<atcoder/modint>)
 #  include <atcoder/modint>
 #endif
@@ -37,6 +39,16 @@ template <typename T, typename Sep = char> inline auto output(const T &target, S
     output(target.first, separator);
     write_stdout(separator);
     output(target.second, separator, flush);
+  } else if constexpr (is_tuple_v<T>) {
+    auto separate = false;
+    std::apply([&](const auto &... elems) {
+      (([&](const auto &elem) {
+        if (separate) write_stdout(separator);
+        output(elem, separator);
+        separate = true;
+      })(elems), ...);
+    }, target);
+    if (flush) write_stdout("", flush);
   } else {
     write_stdout("<unknown>", flush);
   }
