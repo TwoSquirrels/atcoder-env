@@ -26,7 +26,7 @@
 #include <risu/math/prime/prime.hpp>
 
 #include <risu/grid/direction.hpp>
-#include <risu/grid/rotate.hpp>
+#include <risu/grid/rotated.hpp>
 
 #include <risu/io/input.hpp>
 #include <risu/io/output.hpp>
