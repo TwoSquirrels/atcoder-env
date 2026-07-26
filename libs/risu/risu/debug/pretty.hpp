@@ -4,12 +4,14 @@
 #include <risu/util/traits/is_pair.hpp>
 #include <risu/util/traits/is_tuple.hpp>
 #include <risu/util/traits/iterable.hpp>
+#include <risu/util/traits/ostreamable.hpp>
 #include <risu/util/int128.hpp>
 #include <risu/util/inf.hpp>
 #include <risu/util/typename.hpp>
 
 #include <concepts>
 #include <limits>
+#include <sstream>
 #include <string>
 #include <tuple>
 #include <type_traits>
@@ -75,6 +77,10 @@ template <typename T> auto to_pretty_str(const T &target) -> std::string {
     }
     if (separate) str += " "s;
     str += "}"s;
+  } else if constexpr (ostreamable_v<T>) {
+    auto ss = std::ostringstream();
+    ss << target;
+    str += ss.str();
   } else {
     str += "<"s + get_typename<T>(20);
     str += " ("s + to_string(sizeof(target)) + " byte)>"s;
