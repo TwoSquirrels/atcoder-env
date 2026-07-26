@@ -35,7 +35,7 @@ inline auto dump_canvas_f(std::string_view label, const std::vector<std::string>
     return txt;
   }, loc);
 }
-#  define dump_canvas(canvas) dump_canvas_f((#canvas), (canvas))
+#  define dump_canvas(...) dump_canvas_f((#__VA_ARGS__), __VA_ARGS__)
 
 #else // DEBUG
 #  define dump_canvas(...)

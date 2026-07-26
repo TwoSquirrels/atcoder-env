@@ -14,7 +14,6 @@
 #include <string>
 #include <vector>
 
-// TODO: fix
 template <typename T>
 auto dump_table_f(std::string label, const std::vector<std::vector<T>> &table,
                   const std::source_location &loc = std::source_location::current()) -> void {
@@ -35,7 +34,7 @@ auto dump_table_f(std::string label, const std::vector<std::vector<T>> &table,
     ss << label << " (" << h << " x " << w << ")\n";
     ss << std::string(row_idx_width + 2, ' ');
     for (auto x = 0; x < w; ++x) ss << " " << std::setw(col_width[x]) << x;
-    ss << "\n" << std::string(row_idx_width + 2, ' ') << "+";
+    ss << "\n" << std::string(row_idx_width + 1, ' ') << "+";
     for (auto x = 0; x < w; ++x) ss << std::string(col_width[x] + 1, '-') << ((x == w - 1) ? "+" : "");
     ss << "\n";
     for (auto y = 0; y < h; ++y) {
@@ -46,7 +45,7 @@ auto dump_table_f(std::string label, const std::vector<std::vector<T>> &table,
     return ss.str();
   }, loc);
 }
-#  define dump_table(table) dump_table_f((#table), (table))
+#  define dump_table(...) dump_table_f((#__VA_ARGS__), __VA_ARGS__)
 
 #else // DEBUG
 #  define dump_table(...)

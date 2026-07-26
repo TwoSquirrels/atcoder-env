@@ -2,6 +2,7 @@
 
 #include <risu/prelude.hpp>
 #include <risu/util/traits/is_pair.hpp>
+#include <risu/util/traits/is_tuple.hpp>
 #include <risu/util/traits/iterable.hpp>
 #include <risu/util/int128.hpp>
 #include <risu/util/inf.hpp>
@@ -10,6 +11,7 @@
 #include <concepts>
 #include <limits>
 #include <string>
+#include <tuple>
 #include <type_traits>
 #if __has_include(<atcoder/modint>)
 #  include <atcoder/modint>
@@ -41,6 +43,17 @@ template <typename T> auto to_pretty_str(const T &target) -> std::string {
   } else if constexpr (is_pair_v<T>) {
     str += "("s + to_pretty_str(target.first);
     str += ", "s + to_pretty_str(target.second) + ")"s;
+  } else if constexpr (is_tuple_v<T>) {
+    str += "("s;
+    auto separate = false;
+    apply([&](const auto &... elems) {
+      (([&](const auto &elem) {
+        if (separate) str += ", "s;
+        str += to_pretty_str(elem);
+        separate = true;
+      })(elems), ...);
+    }, target);
+    str += ")"s;
   } else if constexpr (convertible_to<T, string>) {
     str += "\""s + target + "\""s;
   } else if constexpr (is_array_v<T>) {
