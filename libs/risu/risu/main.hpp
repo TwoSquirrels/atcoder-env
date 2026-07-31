@@ -1,47 +1,55 @@
 #pragma once
 
-#include <risu/prelude.hpp>
-#include <risu/io/output.hpp>
+#include "io/output.hpp"
+#ifdef DEBUG
+#  include "io/input.hpp"
+#  include "debug/debug.hpp"
+#endif
 
 #include <exception>
 #include <iomanip>
 #include <iostream>
 #include <string>
 #ifdef DEBUG
-#  include <risu/io/input.hpp>
-#  include <risu/debug/debug.hpp>
 #  include <chrono>
-#endif // DEBUG
+#endif
 
-inline auto cp_main() -> std::string;
-
-#ifndef RISU_NO_MAIN
+namespace risu {
+auto main() -> void;
+}
 
 auto main() -> int {
   using namespace std;
-#  ifdef DEBUG
+  ios_base::sync_with_stdio(false); // so I must not use stdio.
+  cout << fixed << setprecision(15);
+#ifdef DEBUG
   using namespace std::chrono;
+  using namespace risu::internal;
   cerr << "[INFO] running in debug mode!" << endl;
+  // TODO: 直近のカバレッジを記録する何かを作る.
+  auto exit_code = 0;
   const auto start = steady_clock::now();
   try {
-#  endif // DEBUG
-    cin.tie(nullptr);
-    ios_base::sync_with_stdio(false);
-    cout << fixed << setprecision(12);
-    // run!!!
-    const auto result = cp_main();
-    if (!result.empty()) write_stdout(result);
-#  ifdef DEBUG
-    write_stdout('\n', true);
+#else
+    cin.tie(nullptr); // so I need to flush manually before cin in interactive problems.
+#endif
+    risu::main();
+#ifdef DEBUG
   } catch (const exception &e) {
-    write_stdout('\n', true);
-    cerr << "[ERROR] " << e.what() << endl;
+    cout.flush();
+    cerr << "\n[ERROR] " << e.what() << endl;
+    exit_code = 1;
+  } catch (...) {
+    cout.flush();
+    cerr << "\n[ERROR] unknown exception" << endl;
+    exit_code = 1;
   }
   const auto end = steady_clock::now();
-  const auto time_ms = duration_cast<milliseconds>(end - start - input_total - debug_total);
-  cerr << "[INFO] finished in " << time_ms.count() << " ms!" << endl;
-#  endif // DEBUG
+  const auto time_us = duration_cast<microseconds>(end - start - input_total - debug_total);
+  cout.flush();
+  cerr << "[INFO] finished in " << time_us.count() / 1000.0 << " ms!" << endl;
+  return exit_code;
+#else
   return 0;
+#endif
 }
-
-#endif // RISU_NO_MAIN

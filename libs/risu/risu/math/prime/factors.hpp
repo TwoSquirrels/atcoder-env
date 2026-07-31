@@ -31,7 +31,7 @@ template <bool osa_k = false, typename T> auto factors(T n) -> std::vector<std::
       }
     }
     while (n != 1) {
-      if (!result.empty() && result.back().first == spf[n]) ++result.back().second;
+      if (not result.empty() && result.back().first == spf[n]) ++result.back().second;
       else result.emplace_back(spf[n], 1);
       n /= spf[n];
     }

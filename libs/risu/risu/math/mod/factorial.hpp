@@ -14,7 +14,7 @@
 template <typename T> auto fact(int n, bool inv = false) -> T {
   assert(n >= 0);
   static auto factorials = std::vector<std::pair<T, T>>{ { 1, 1 } };
-  for (auto i = int(factorials.size()); i <= n; ++i) factorials.emplace_back(i * factorials[i - 1].first, 0);
+  for (auto i = std::ssize(factorials); i <= n; ++i) factorials.emplace_back(i * factorials[i - 1].first, 0);
   if (inv && factorials[n].second == 0) {
     if constexpr (std::is_integral_v<T>) factorials[n].second = factorials[n].first <= 1 ? 1 : 0;
 #if __has_include(<atcoder/modint>)

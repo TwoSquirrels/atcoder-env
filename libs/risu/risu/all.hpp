@@ -1,44 +1,35 @@
 #pragma once
 
-#include <risu/prelude.hpp>
-#include <risu/std.hpp>
+#include "util/aliases.hpp"
+#include "util/chminmax.hpp"
+#include "util/inf.hpp"
+#include "util/int128.hpp"
+#include "util/iota.hpp"
 
-#include <risu/util/chminmax.hpp>
-#include <risu/util/inf.hpp>
-#include <risu/util/int128.hpp>
-#include <risu/util/iota.hpp>
-#include <risu/util/typename.hpp>
+#include "util/traits/is_pair.hpp"
+#include "util/traits/is_tuple.hpp"
+#include "util/traits/istreamable.hpp"
+#include "util/traits/iterable.hpp"
+#include "util/traits/ostreamable.hpp"
 
-#include <risu/util/traits/is_pair.hpp>
-#include <risu/util/traits/is_tuple.hpp>
-#include <risu/util/traits/istreamable.hpp>
-#include <risu/util/traits/iterable.hpp>
-#include <risu/util/traits/ostreamable.hpp>
+#include "math/powi.hpp"
 
-#include <risu/math/powi.hpp>
+#include "math/mod/combination.hpp"
+#include "math/mod/factorial.hpp"
+#include "math/mod/mint_inv.hpp"
 
-#include <risu/math/mod/combination.hpp>
-#include <risu/math/mod/factorial.hpp>
-#include <risu/math/mod/mint_inv.hpp>
+#include "math/prime/divisors.hpp"
+#include "math/prime/factors.hpp"
+#include "math/prime/prime.hpp"
 
-#include <risu/math/prime/divisors.hpp>
-#include <risu/math/prime/factors.hpp>
-#include <risu/math/prime/prime.hpp>
+#include "grid/direction.hpp"
+#include "grid/rotated.hpp"
 
-#include <risu/grid/direction.hpp>
-#include <risu/grid/rotated.hpp>
+#include "io/input.hpp"
+#include "io/output.hpp"
 
-#include <risu/io/input.hpp>
-#include <risu/io/output.hpp>
-
-#include <risu/debug/debug.hpp>
-#include <risu/debug/dump.hpp>
-#include <risu/debug/dump_canvas.hpp>
-#include <risu/debug/dump_table.hpp>
-#include <risu/debug/pretty.hpp>
-
-#include <risu/main.hpp>
-
-#include <risu/aliases.hpp>
-#include <risu/constants.hpp>
-#include <risu/macros.hpp>
+#include "debug/debug.hpp"
+#include "debug/dump.hpp"
+#include "debug/dump_canvas.hpp"
+#include "debug/dump_table.hpp"
+#include "debug/prettify.hpp"
